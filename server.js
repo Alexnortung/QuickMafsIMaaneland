@@ -8,6 +8,12 @@ app.use("/", express.static(__dirname + "/game"));
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'))
 
-io.on('connection', function(socket){
+io.on('connection', function(socket)
+{
   console.log('a user connected');
+
+  socket.on('disconnect', function()
+  {
+  console.log('user disconnected');
+  });
 });
