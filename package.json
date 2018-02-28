@@ -1,0 +1,30 @@
+{
+  "name": "quickmafsimaaneland",
+  "version": "0.0.1",
+  "description": "Desc",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.16.2",
+    "mysql": "^2.15.0",
+    "npm": "^5.6.0",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexnortung/QuickMafsIMaaneland.git"
+  },
+  "keywords": [
+    "Quickmafs",
+    "maaneland"
+  ],
+  "author": "Nicolas Dyhrman, Alexander Nortung",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alexnortung/QuickMafsIMaaneland/issues"
+  },
+  "homepage": "https://github.com/Alexnortung/QuickMafsIMaaneland#readme"
+}
