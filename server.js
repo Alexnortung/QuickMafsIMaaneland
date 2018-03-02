@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var mysql = require('mysql');
 var io = require('socket.io')(http);
+var sqlS = require('./sqlSetup.js');
 
 app.use("/", express.static(__dirname + "/game"));
 
@@ -17,3 +18,8 @@ io.on('connection', function(socket)
   console.log('user disconnected');
   });
 });
+
+sqlS.SetupMySql(mysql);
+var con = sqlS.CreateNewCon(mysql);
+sqlS.CreateUserTable(con);
+sqlS.CreateMatchesTable(con);
