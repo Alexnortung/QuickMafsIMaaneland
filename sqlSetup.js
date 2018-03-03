@@ -14,7 +14,7 @@ exports.SetupMySql = function (mysql)
     }
     else
     {
-      console.log("Connected!");
+      console.log("Conntected To MySql Server!");
       con.query("CREATE DATABASE IF NOT EXISTS quickmafs;", function (err, result)
       {
         if (err)
@@ -23,7 +23,7 @@ exports.SetupMySql = function (mysql)
         }
         else
         {
-          console.log("Database created");
+          console.log("Database quickmafs created");
         }
       });
     }
