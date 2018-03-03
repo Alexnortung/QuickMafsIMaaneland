@@ -8,11 +8,31 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
-    var socket = io();
+      var socket = io();
     </script>
+    <!--<script src="js/game.js"></script>-->
+    <script src="js/site.js"></script>
   </head>
 
   <body>
+    <div id="overlay">
+      <div id="loginOverlay">
+        <p><label class="label" for="sharepoint-company-name">Username</label><br><input type="text" class="input" id="username" placeholder="Username" /></p>
+        <p><label class="label" for="sharepoint-company-name">Password</label><br><input type="text" class="input" id="password" placeholder="Password" /></p>
+        <p><label class="label" for="sharepoint-company-name">Re-type Password</label><br><input type="text" class="input" id="repassword" placeholder="Re-type password" /></p>
+        <p><label class="label" for="sharepoint-company-name">E-mail</label><br><input type="text" class="input" id="email" placeholder="E-mail" /></p>
+        <p><label class="label" for="sharepoint-company-name">Display name</label><br><input type="text" class="input" id="displayname" placeholder="Display name" /></p>
+        <button id="registerButton" class="button">Register</button>
+      </div>
+      <div id="registerOverlay"></div>
+    </div>
+
+
+  <ul>
+    <li id="login"><a>Login</a></li>
+    <li id="register"><a>Register</a></li>
+  </ul>
+
     <canvas id="gameCanvas" width="800" height="800" style="border: 1px solid black;"></canvas>
   </body>
 
