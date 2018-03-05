@@ -1,9 +1,10 @@
 var c;
 var ctx;
+var socket;
 
 $(function ()
 {
-    var socket = io();
+    socket = io();
 
     var c = document.getElementById("gameCanvas");
     var ctx = c.getContext('2d');
