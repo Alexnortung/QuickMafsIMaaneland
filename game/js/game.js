@@ -1,3 +1,4 @@
+
 $(function () {
     //var socket = io();
 
@@ -45,4 +46,11 @@ function MainMenu() {
 
 }
 
+
+
+function changeCanvasPosition()
+{
+  c.style.marginRight = ((window.width/2) - (c.width/2)) + "px";
+  c.style.marginTop = ((window.height/2) - (c.height/2)) + "px";
+}
 
