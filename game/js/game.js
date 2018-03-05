@@ -77,7 +77,7 @@ function Game(questions){
 }
 
 Game.prototype.getGameState = function() {
-	//emit to the server that 
+	//emit to the server that the client needs current gamestate
 };
 
 
