@@ -108,7 +108,9 @@ function onChallengeResponse(data) {
 	//data should be an object with an accepted key as a boolean of the other payer accepted  
 }
 
-
+function onConnectAndGame(){
+	//box on screen
+}
 
 
 
@@ -117,11 +119,18 @@ function onChallengeResponse(data) {
 
 function Game(questions){
 	this.questions = questions;
+	this.currentQuestion = questions[0];
 }
 
 Game.prototype.getGameState = function() {
 	//emit to the server that the client needs current gamestate
 };
+
+
+Game.prototype.sendAnswer = function () {
+	
+};
+
 
 
 
