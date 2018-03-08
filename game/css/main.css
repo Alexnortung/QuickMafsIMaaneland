@@ -1,53 +1,49 @@
-canvas
-{
- position: absolute;
- top:0;
- bottom: 0;
- left: 0;
- right: 0;
- margin:auto;
+canvas {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 
 ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
 }
 
 li {
-    float: right;
+  float: right;
 }
 
 li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
 }
 
 li a:hover:not(.active) {
-    background-color: #111;
+  background-color: #111;
 }
 
-.label
-{
+.label {
   margin: 0% 5%;
   padding: 3px;
 }
 
-.input
-{
+.input {
   width: 90%;
   margin: 0% 5%;
   border-radius: 5px;
   padding: 2px;
 }
 
-.button
-{
+.button {
   width: 90%;
   margin: 0% 5%;
   background-color: blue;
@@ -55,9 +51,7 @@ li a:hover:not(.active) {
   padding: 10px;
 }
 
-
-#overlay
-{
+#overlay {
   position: fixed;
   display: none;
   width: 100%;
@@ -66,13 +60,13 @@ li a:hover:not(.active) {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 2;
   cursor: pointer;
 }
 
-#loginOverlay
-{
+#loginOverlay {
+  display: none;
   position: relative;
   width: 30%;
   background-color: white;
@@ -80,4 +74,20 @@ li a:hover:not(.active) {
   border-radius: 5px;
   top: 30%;
   left: 35%;
+}
+
+#registerOverlay {
+  display: none;
+  position: relative;
+  width: 30%;
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  top: 30%;
+  left: 35%;
+}
+
+.CloseOverlay
+{
+  float: right;
 }
