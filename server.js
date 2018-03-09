@@ -10,7 +10,7 @@ var crypt = require('./passwordCrypt.js');
 app.use("/", express.static(__dirname + "/game"));
 
 var con;
-sqlS.SetupMySql(mysql, function()
+sqlS.SetupMySqldev(mysql, function()
 {
   con = sqlS.CreateNewCon(mysql)
   sqlS.CreateUserTable(con);
@@ -19,7 +19,11 @@ sqlS.SetupMySql(mysql, function()
 
 io.on('connection', function(socket)
 {
-  console.log(socket.username + ' connected');
+  console.log(socket.username + " Logged in");
+  if (typeof socket.login !== "undefined")
+  {
+    socket.emit("LoggedMenu", socket.username);
+  }
 
   socket.on('register', function(registerArray)
   {
@@ -83,41 +87,44 @@ function login(username, password, socket, callback)
 {
   var username = [[username]];
   var sqlQuery = "SELECT password, display_name, Email FROM users WHERE username = ?";
-  con.query(sqlQuery, [username], function(err, result, fields)
+  if (typeof username !== "undefined" && username !== "" && typeof password !== "undefined" && password !== "")
   {
-    if (err)
+    con.query(sqlQuery, [username], function(err, result, fields)
     {
-      console.log("err: " + err);
-    }
-    else
-    {
-      console.log("Query Succesfully Worked");
-      var dbPassword = result[0].password;
-      var displayname = result[0].display_name;
-      var email = result[0].Email;
-      crypt.comparePassword(password, dbPassword, function(err, isMatch)
+      if (err)
       {
-        if (err)
+        console.log("err: " + err);
+      }
+      else
+      {
+        console.log("Query Succesfully Worked");
+        var dbPassword = result[0].password;
+        var displayname = result[0].display_name;
+        var email = result[0].Email;
+        crypt.comparePassword(password, dbPassword, function(err, isMatch)
         {
-          console.log("Error: " + err)
-        }
-        else if (isMatch)
-        {
-          socket.login = true;
-          socket.username = username;
-          socket.password = password;
-          socket.emit("LoggedMenu", socket.displayname);
-          console.log("Player Logged In");
-          console.log("Match: " + isMatch);
-          callback();
-        }
-        else
-        {
-          console.log("Match: " + isMatch);
-        }
-      });
-    }
-  });
+          if (err)
+          {
+            console.log("Error: " + err)
+          }
+          else if (isMatch)
+          {
+            socket.login = true;
+            socket.username = username;
+            socket.password = password;
+            socket.emit("LoggedMenu", socket.username);
+            console.log("Player Logged In");
+            console.log("Match: " + isMatch);
+            callback();
+          }
+          else
+          {
+            console.log("Match: " + isMatch);
+          }
+        });
+      }
+    });
+  }
 }
 
 http.listen(3000, function(){

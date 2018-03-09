@@ -29,6 +29,10 @@ $(function() {
   {
     console.log("Overlay Removal initiated");
     $("#overlay").remove();
+    $("#login").remove();
+    $("#register").remove();
+    $("#header").append("<li id='logout'><a>Log out</a></li>");
+    $("#header").append("<li><p style='color: white;'>Hello, " + username + "</li>");
     //Remove other
     //Place logout loginButton
     //Write "Hello, " + username
