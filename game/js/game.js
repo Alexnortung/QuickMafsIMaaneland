@@ -65,8 +65,10 @@ function MainMenu() {
 		fill(0, 128, 43);
 		rect(getSize(0.7, 0), getSize(0.75, 1), getSize(0.2, 0), getSize(0.175, 1), 20);
 		pop();
-		
 		//text
+		text();
+
+
 	}
 
 }
