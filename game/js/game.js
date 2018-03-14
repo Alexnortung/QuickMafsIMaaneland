@@ -5,21 +5,23 @@ var socket;
 var currentGame;
 var findingGame = false;
 var ingame = false;
+var ci;
 
 $(function ()
 {
-    socket = io();
+	socket = io();
 
-
-  });
+});
 
 
 var mgr;
 
 function setup() {
-	var c = createCanvas(600,500);
+	console.log("henlo world!");
+	c = createCanvas(600,500);
+	
 
-	$(c.elt.id).appendTo("#canvasContainer");
+	$(c.canvas.id).appendTo("#canvasContainer");
 	mgr = new SceneManager();
 
 	mgr.addScene(MainMenu);
@@ -36,6 +38,9 @@ function draw() {
 
 function MainMenu() {
 	this.setup = function(){
+		ci = new CanvasInput({
+			canvas: document.getElementById(c.canvas.id)
+		});
 
 
 
@@ -44,6 +49,7 @@ function MainMenu() {
 	this.draw = function() {
 		//background
 		background(50);
+		ci.render();
 
 		//queue for match button
 		//rect
@@ -51,17 +57,32 @@ function MainMenu() {
 		//text
 	}
 
+}
 
-	
+
+
+function GameScene() {
+	this.setup = function(){
+		//instantiate input
+		//set game object
+
+	}
+
+	this.draw = function(){
+		//draw background
+		//draw question
+		//draw input
+	}
 
 }
 
 
 
+
 function changeCanvasPosition()
 {
-  c.style.marginRight = ((window.width/2) - (c.width/2)) + "px";
-  c.style.marginTop = ((window.height/2) - (c.height/2)) + "px";
+  c.canvas.style.marginRight = ((window.width/2) - (c.canvas.width/2)) + "px";
+  c.canvas.style.marginTop = ((window.height/2) - (c.canvas.height/2)) + "px";
 }
 
 
@@ -117,20 +138,63 @@ function onConnectAndGame(){
 
 
 
-function Game(questions){
-	this.questions = questions;
-	this.currentQuestion = questions[0];
+function MathGame(){
+
 }
 
-Game.prototype.getGameState = function() {
-	//emit to the server that the client needs current gamestate
+
+
+
+
+
+
+
+
+
+
+
+
+
+function Region(x,y,width, height, func) {
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+	this.func = func;
+}
+
+
+function ClickHandler() {
+	this.regions = [];
+}
+
+ClickHandler.prototype.addRegion = function(region) {
+	this.regions.push(region);
 };
 
-
-Game.prototype.sendAnswer = function () {
-	
+ClickHandler.prototype.removeRegion = function() {
+	// body...
 };
 
+ClickHandler.prototype.onClick = function(x,y) {
+	//check all regions if the click was inside one of them
+	for (var i = this.regions.length - 1; i >= 0; i--) {
+		if (!this.regions[i].x < x) {
+			continue;
+		}
+		if (!(this.regions[i].x + this.regions[i].width) > x ) {
+			continue;
+		}
+		if (!this.regions[i].y < y) {
+			continue;
+		}
+		if (!(this.regions[i].y + this.regions[i].height) > y ) {
+			continue;
+		}
 
+		regions[i].func();
 
+		break;
+	}
+};
 
