@@ -5,7 +5,7 @@ var socket;
 var currentGame;
 var findingGame = false;
 var ingame = false;
-var ci;
+var canvasSize;
 
 $(function ()
 {
@@ -18,7 +18,8 @@ var mgr;
 
 function setup() {
 	console.log("henlo world!");
-	c = createCanvas(600,500);
+	c = createCanvas(1920*0.6,1080*0.6);
+	
 	
 
 	$(c.canvas.id).appendTo("#canvasContainer");
@@ -35,12 +36,19 @@ function draw() {
 }
 
 
+function getSize(scale, direction){
+	if (direction == 0) {
+		return scale * width;
+	} else {
+		return scale * height;
+	}
+}
+
 
 function MainMenu() {
 	this.setup = function(){
-		ci = new CanvasInput({
-			canvas: document.getElementById(c.canvas.id)
-		});
+		this.bg = loadImage("img/MånebyLockedandLoadedExpandedVersion.png");
+		this.queueBut = loadImage("img/Queue.png");
 
 
 
@@ -48,12 +56,16 @@ function MainMenu() {
 
 	this.draw = function() {
 		//background
-		background(50);
-		ci.render();
+		background(this.bg);
+		
 
 		//queue for match button
-		//rect
-
+		//box
+		push();
+		fill(0, 128, 43);
+		rect(getSize(0.7, 0), getSize(0.75, 1), getSize(0.2, 0), getSize(0.175, 1), 20);
+		pop();
+		
 		//text
 	}
 
@@ -63,8 +75,12 @@ function MainMenu() {
 
 function GameScene() {
 	this.setup = function(){
-		//instantiate input
+		
 		//set game object
+		//instantiate input
+		this.ci = new CanvasInput({
+			canvas: document.getElementById(c.canvas.id)
+		});
 
 	}
 
@@ -72,6 +88,7 @@ function GameScene() {
 		//draw background
 		//draw question
 		//draw input
+		this.ci.render();
 	}
 
 }
