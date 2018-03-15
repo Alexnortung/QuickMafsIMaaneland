@@ -117,29 +117,7 @@ MainMenu.prototype.mousePress = function () {
 
 
 
-function GameScene() {
-	this.setup = function(){
-		
-		//set game object
-		//instantiate input
-		this.ci = new CanvasInput({
-			canvas: document.getElementById(c.canvas.id)
-		});
 
-	}
-
-	this.draw = function(){
-		//draw background
-		//draw question
-		//draw input
-		this.ci.render();
-	}
-
-}
-
-GameScene.prototype.mousePress = function () {
-	this._mouseHandler.onClick(mouseX, mouseY);
-}
 
 
 
@@ -264,16 +242,66 @@ function onConnectAndGame(){
 
 
 
+function GameScene() {
+	this.setup = function(){
+
+		//get background image
+		this.bg = loadImage("img/Battleground.png");
+		//get building images
+		var mb = "img/Moonbygning";
+		this.buildings = [
+			loadImage(mb + "Blue.png"),
+			loadImage(mb + "Green.png"),
+			loadImage(mb + "Orange.png"),
+			loadImage(mb + "Purple.png"),
+			loadImage(mb + "Red.png")
+		];
+
+		//set game object
+		this.game = new MathGame();
+		this.isGameReady = true;
+
+		//instantiate input
+		this.ci = new CanvasInput({
+			canvas: document.getElementById(c.canvas.id)
+		});
+
+	}
+
+	this.draw = function(){
+		//draw background
+		background(this.bg);
+		
+		
+
+		//show the input if the game is running
+		if (this.gameRunning) {
+			this.ci.render();
+			//draw question
+		}
+		
+	}
+
+}
+
+GameScene.prototype.mousePress = function () {
+	this._mouseHandler.onClick(mouseX, mouseY);
+}
 
 
 
-function MathGame(questionLength, callback){
+function MathGame(){
 	this.player0 = new MathGamePlayer();
 	this.player1 = new MathGamePlayer();
 	this.players = [player0, player1];
 	this.questionLength = questionLength;
 	this.callback = callback;
 }
+
+MathGame.prototype.setPlayerName = function(playerInt, name) {
+	this.players[playerInt].name = name;
+
+};
 
 MathGame.prototype.addProgress = function (playerInt) {
 	this.players[playerInt].addProgress();
@@ -284,20 +312,40 @@ MathGame.prototype.addProgress = function (playerInt) {
 		//start winner animation
 
 		//run callback function
-		this.callback();
+		if (typeof this.callback == "function") {
+			this.callback();
+		}
+		
 	}
+}
+
+function onGameData(data) {
+	/* data should be an object that contains:
+	gameData: object:
+		key for each of the 
+	//*/
+
+	var ti = setInterval(()=>{
+		if (mgr.scene.oScene.isGameReady) {
+			clearInterval(ti);
+			var d1 = checkData();
+			if (d1 != false) {
+				Object.keys(d1.gameData).forEach(key => {
+					mgr.scene.oScene.game[key] = d1.gameData[key];
+				})
+			}
+			
+		}
+	}, 500)
+
 
 
 }
 
 
 
-
-
-
-
-
-function MathGamePlayer() {
+function MathGamePlayer(playerName) {
+	this.name = playerName;
 	this.progress = 0;
 }
 
@@ -330,6 +378,7 @@ Region.prototype.isInside = function() {
 	if ((this.y + this.h) < mouseY ) {
 		return false;
 	}
+	//returns true if the mouse is inside
 	return true;
 }
 
