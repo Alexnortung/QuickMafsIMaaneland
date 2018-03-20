@@ -9,7 +9,9 @@ var canvasSize;
 
 $(function ()
 {
+
 	socket = io();
+	//set socket listeners
 
 });
 
@@ -17,18 +19,21 @@ $(function ()
 var mgr;
 
 function setup() {
-	//p5 function
 	console.log("henlo world!");
 	c = createCanvas(1920*0.6,1080*0.6);
 	
 	
 
 	$(c.canvas.id).appendTo("#canvasContainer");
+
+	//instantiating scenemanager
 	mgr = new SceneManager();
 
+	//adding scenes to scene manager
 	mgr.addScene(MainMenu);
 	mgr.addScene(GameScene);
 
+	//show the first scene
 	mgr.showNextScene();
 
 }
@@ -209,18 +214,17 @@ function checkData(data) {
 
 function onGameFound(data) {
 	//data should be a JSON object containing:
-	//questions: an array of question objects
+	//gameData: an object with game data
 	var d1 = checkData(data);
 	if (d1 == false) {
 		return;
 	}
-	
-	if (typeof d1.questions != "object") {
-		console.log("foundgame response .queations is not an array");
-	}
 
-	currentGame = new Game(d1.questions);
+	currentGame = new MathGame(d1.player0, d1.player1, d1.questionLength);
 	//change scene to Game
+
+	mgr.showScene(GameScene, currentGame);
+
 
 }
 
@@ -258,8 +262,15 @@ function GameScene() {
 		];
 
 		//set game object
-		this.game = new MathGame();
+
+		this.game = this.sceneArgs;
+		this.winner = null;
+		this.tick = 0;
+		this.endGameTick = 0;
 		this.isGameReady = true;
+		this.endGame = false;
+
+		this._mouseHandler = new MouseHandler();
 
 		//instantiate input
 		this.ci = new CanvasInput({
@@ -271,6 +282,28 @@ function GameScene() {
 	this.draw = function(){
 		//draw background
 		background(this.bg);
+
+		//draw player names
+		push();
+		fill(255,255,0);
+		textSize(getSize(32/1920,0));
+		textAlign(LEFT,TOP);
+		text(this.game.player0.name, getSize(0.01,0), getSize(0.01,1));
+		textAlign(RIGHT,TOP);
+		text(this.game.player1.name, getSize(0.99,0), getSize(0.01,1));
+		pop();
+
+
+		//draw both players progress as houses
+		//player0
+		for (var i = 0; i < this.game.player0.progress; i++) {
+			//Draw building relative to its i;
+			if (i < this.buildings.length) {
+				image(this.buildings[i], getSize(0.01 + 0.08 * i, 0), getSize(0.9, 1), getSize(0.08, 0), getSize(0.08, 1), 0,0);
+			}
+			
+		}
+
 		
 		
 
@@ -279,6 +312,29 @@ function GameScene() {
 			this.ci.render();
 			//draw question
 		}
+
+		if (this.endGame) {
+			//draw winner string
+			push();
+			textAlign(CENTER);
+			textSize(getSize(64/1920, 0));
+			fill(255,255,0);
+			text(this.winner.name + " won the game!", getSize(0.5, 0), getSize(0.5, 1));
+			pop();
+			this.endGameTick++;
+
+
+			if (this.endGameTick >= 600) {
+
+				//change scene to main menu
+				mgr.scene.setupExecuted = false;
+				mgr.showScene(MainMenu);
+
+				
+			}
+			this.endGameTick++;
+		}
+		this.tick++;
 		
 	}
 
@@ -290,12 +346,12 @@ GameScene.prototype.mousePress = function () {
 
 
 
-function MathGame(){
-	this.player0 = new MathGamePlayer();
-	this.player1 = new MathGamePlayer();
-	this.players = [player0, player1];
+function MathGame(player0, player1, questionLength){
+	this.player0 = new MathGamePlayer(player0);
+	this.player1 = new MathGamePlayer(player1);
+	this.players = [this.player0,this.player1];
 	this.questionLength = questionLength;
-	this.callback = callback;
+	
 }
 
 MathGame.prototype.setPlayerName = function(playerInt, name) {
@@ -308,13 +364,11 @@ MathGame.prototype.addProgress = function (playerInt) {
 	if (this.players[playerInt].progress == this.questionLength) {
 		//this player has won!
 		//end the game by telling who won the game
+		var tScene = mgr.scene.oScene
+		
+		tScene.winner = this.players[playerInt];
+		tScene.endGame = true;
 
-		//start winner animation
-
-		//run callback function
-		if (typeof this.callback == "function") {
-			this.callback();
-		}
 		
 	}
 }
@@ -322,7 +376,7 @@ MathGame.prototype.addProgress = function (playerInt) {
 function onGameData(data) {
 	/* data should be an object that contains:
 	gameData: object:
-		key for each of the 
+		key for each of the thing that need to be updated in the game
 	//*/
 
 	var ti = setInterval(()=>{
@@ -332,26 +386,74 @@ function onGameData(data) {
 			if (d1 != false) {
 				Object.keys(d1.gameData).forEach(key => {
 					mgr.scene.oScene.game[key] = d1.gameData[key];
-				})
+				});
 			}
 			
 		}
-	}, 500)
+	}, 500);
+}
+
+function onAddprogress(data) {
+	/* data should be an object with:
+	playerInt: integer (the player to add progress to)
+	 */
+
+	 var d1 = checkData(data);
+	 if (d1 == false) {
+	 	return;
+	 }
+
+	mgr.scene.oScene.game.addProgress(d1.playerInt);
+}
 
 
+function onQuestionRecieved(data) {
+	
+}
 
+function onAnswerRecieved(data) {
+	
 }
 
 
 
-function MathGamePlayer(playerName) {
-	this.name = playerName;
+
+function QuestionHolder() {
+	this.questions = [];
+	this.showingQuestion = 0;
+}
+
+QuestionHolder.prototype.addQuestion = function(question) {
+	this.questions.push(question);
+	return this;
+};
+
+QuestionHolder.prototype.showingQuestion = function(questionNumber) {
+	this.showingQuestion = questionNumber;
+	return this;
+};
+
+
+function Question(img) {
+	this.img = img;
+	this.answer = null;
+}
+
+Question.prototype.setAnswer = function(answer) {
+	this.answer = answer;
+};
+
+
+
+function MathGamePlayer(name) {
+	this.name = name;
 	this.progress = 0;
 }
 
 MathGamePlayer.prototype.addProgress = function() {
 	this.progress++;
 };
+
 
 
 
