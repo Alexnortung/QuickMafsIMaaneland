@@ -271,6 +271,7 @@ function GameScene() {
 		this.endGame = false;
 
 		this._mouseHandler = new MouseHandler();
+		this.questionHolder = new QuestionHolder();
 
 		//instantiate input
 		this.ci = new CanvasInput({
@@ -309,9 +310,21 @@ function GameScene() {
 
 		//show the input if the game is running
 		if (this.gameRunning) {
-			this.ci.render();
 			//draw question
+
+			image(this.questionHolder.questions[this.questionHolder.showingQuestion].img);
+
+			if (this.questionHolder.unAnswered == this.questionHolder.showingQuestion) {
+				//draw input
+				this.ci.render();
+			}
+
+			//draw answer
+			
+
 		}
+
+
 
 		if (this.endGame) {
 			//draw winner string
@@ -349,7 +362,7 @@ GameScene.prototype.mousePress = function () {
 function MathGame(player0, player1, questionLength){
 	this.player0 = new MathGamePlayer(player0);
 	this.player1 = new MathGamePlayer(player1);
-	this.players = [this.player0,this.player1];
+	this.players = [this.player0, this.player1];
 	this.questionLength = questionLength;
 	
 }
@@ -408,19 +421,54 @@ function onAddprogress(data) {
 
 
 function onQuestionRecieved(data) {
-	
+	/* data should be an object with:
+	img: url to the image with the question
+	qId: the unique id for the question
+	*/
+
+	var d1 = checkData(data);
+	if (d1 == false) {
+		return;
+	}
+
+	//instantiate the question
+	var q = new Question(d1.img, d1.qId);
+
+	//add the question to the question holder
+	mgr.scene.oScene.questionHolder.addQuestion(q);
+
+
 }
 
 function onAnswerRecieved(data) {
-	
+	/* data should be an object with:
+	answer: Number 
+	qId: Number (the id of the question)
+	*/
+	var d1 = checkData(data);
+	if (d1 == false) {
+		return;
+	} 
+
+	mgr.scene.oScene.questionHolder.setAnswer(d1.answer, d1.qId);
+}
+
+function answerQuestion(answer, qId){
+	//set the user answer on a question to the answer
+	mgr.scene.oScene.questionHolder.setUserAnswer(answer, qId);
+
+	//emit to the server what the user answered
+	socket.emit("answerQuestion", answer);
 }
 
 
 
 
 function QuestionHolder() {
+	//constructor
 	this.questions = [];
 	this.showingQuestion = 0;
+	this.unAnswered = 0;
 }
 
 QuestionHolder.prototype.addQuestion = function(question) {
@@ -428,16 +476,45 @@ QuestionHolder.prototype.addQuestion = function(question) {
 	return this;
 };
 
-QuestionHolder.prototype.showingQuestion = function(questionNumber) {
+QuestionHolder.prototype.showQuestion = function(questionNumber) {
 	this.showingQuestion = questionNumber;
 	return this;
 };
 
+QuestionHolder.prototype.getQuestion = function(id) {
+	for (var i = this.questions.length - 1; i >= 0; i--) {
+		if(this.questions[i].id == id){
+			return this.questions[i];
 
-function Question(img) {
-	this.img = img;
+		}
+	}
+};
+
+QuestionHolder.prototype.setAnswer = function(answer, id) {
+	this.getQuestion(id).setAnswer(answer);
+};
+
+QuestionHolder.prototype.setUserAnswer = function(answer, id) {
+	this.getQuestion(id).setUserAnswer(answer);
+	this.unAnswered++;
+};
+
+
+
+
+function Question(img, qId) {
+	//constructor
+	this.id = qId;
+	this.img = loadImage(img);
 	this.answer = null;
+	this.userAnswer = null;
+	this.isAnswered = false;
 }
+
+Question.prototype.setUserAnswer = function(answer) {
+	this.setUserAnswer = answer;
+	this.isAnswered = true;
+};
 
 Question.prototype.setAnswer = function(answer) {
 	this.answer = answer;
@@ -446,6 +523,7 @@ Question.prototype.setAnswer = function(answer) {
 
 
 function MathGamePlayer(name) {
+	//constructor
 	this.name = name;
 	this.progress = 0;
 }
@@ -460,6 +538,7 @@ MathGamePlayer.prototype.addProgress = function() {
 
 
 function Region(x,y,width, height) {
+	//constuctor
 	this.x = x;
 	this.y = y;
 	this.w = width;
@@ -489,6 +568,7 @@ Region.prototype.isInside = function() {
 
 
 function MouseHandler() {
+	//constructor
 	this.regions = [];
 	this.rID = 0
 }
