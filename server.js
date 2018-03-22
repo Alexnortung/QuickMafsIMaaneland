@@ -21,13 +21,17 @@ sqlS.SetupMySqldev(mysql, function()
   {
     sqlS.CreateSubQuestions(con, function()
     {
-      sqlS.CreateQuestionAndSubQuestions(con)
-        http.listen(3000, function(){
+      sqlS.CreateQuestionAndSubQuestions(con, function ()
+      {
+        http.listen(3000, function()
+        {
         console.log('listening on: 3000');
+        });
       });
     });
   });
 });
+
 
 var connections = [];
 
@@ -39,7 +43,11 @@ io.on('connection', function(socket)
 {
   connections.push(socket);
   console.log("There are %s connections", connections.length);
-  io.emit("Questions", sqlS.FindQuestion(con));
+  var sql = sqlS.FindQuestion(con, function(sql)
+  {
+    io.emit("Questions", sql);
+    console.log("sql: " + sql);
+  });
 
 /*
   socket.on('register', function(registerArray)
