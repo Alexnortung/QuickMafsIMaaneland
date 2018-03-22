@@ -44,7 +44,7 @@ Init.prototype.findGame = function(socket, gameType) {
     }
     else
     {
-      console.log(socket.id + " neigher qued nor already in game");
+      console.log(socket.id + " neither queued nor already in game");
     }
 
     if (typeof this.queue[0] !== "undefined") {
