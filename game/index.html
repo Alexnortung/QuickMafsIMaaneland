@@ -1,18 +1,22 @@
 <html>
 
-<head>
-  <meta charset="UTF-8">
-  <title>title</title>
-  <link rel="stylesheet" type="text/css" href="css/normalize.css">
-  <link rel="stylesheet" type="text/css" href="css/main.css">
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script>
-    var socket = io();
-  </script>
-  <!--<script src="js/game.js"></script>-->
-  <script src="js/site.js"></script>
-</head>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+    <script src="js/lib/scenemanager.js"></script>
+    <script src="js/lib/canvasInput.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="js/game.js"></script>
+    <script src="js/site.js"></script>
+  </head>
 
 <body>
   <div id="overlay">
@@ -39,10 +43,10 @@
     <li id="login"><a>Login</a></li>
     <li id="register"><a>Register</a></li>
   </ul>
+    <div id="canvasContainer"></div>
+    <!--canvas id="gameCanvas" width="800" height="800" style="border: 1px solid black;"></canvas-->
 
-  <button id="queButton">Click Me For QUEUE!</button>
 
-  <canvas id="gameCanvas" width="800" height="800" style="border: 1px solid black;"></canvas>
-</body>
+  </body>
 
 </html>
