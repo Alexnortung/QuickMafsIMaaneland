@@ -7,6 +7,7 @@ var io = require('socket.io')(http);
 var sqlS = require('./sqlSetup.js');
 var crypt = require('./passwordCrypt.js');
 var queue = require('./Queue.js');
+var question = require('./questions.js');
 
 app.use("/", express.static(__dirname + "/game"));
 
@@ -16,17 +17,30 @@ sqlS.SetupMySqldev(mysql, function()
   con = sqlS.CreateNewCon(mysql)
   sqlS.CreateUserTable(con);
   sqlS.CreateMatchesTable(con);
+  sqlS.CreateQuestions(con, function()
+  {
+    sqlS.CreateSubQuestions(con, function()
+    {
+      sqlS.CreateQuestionAndSubQuestions(con)
+        http.listen(3000, function(){
+        console.log('listening on: 3000');
+      });
+    });
+  });
 });
 
 var connections = [];
 
 var init = new queue.Init(io);
 
+
+
 io.on('connection', function(socket)
 {
-
   connections.push(socket);
   console.log("There are %s connections", connections.length);
+  io.emit("Questions", sqlS.FindQuestion(con));
+
 /*
   socket.on('register', function(registerArray)
   {
@@ -135,7 +149,3 @@ function login(username, password, socket, callback)
     });
   }
 }
-
-http.listen(3000, function(){
-  console.log('listening on: 3000');
-});

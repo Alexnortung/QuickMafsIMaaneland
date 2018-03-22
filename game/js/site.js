@@ -24,6 +24,11 @@ $(function() {
     console.log("Login initiated");
   });
 
+  socket.on("Questions", function(msg)
+  {
+    console.log(msg);
+  });
+
   socket.on("registerResult", function(msg) {
     console.log("Register Status: " + msg);
 
