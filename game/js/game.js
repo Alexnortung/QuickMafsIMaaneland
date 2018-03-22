@@ -13,6 +13,14 @@ $(function ()
 	socket = io();
 	//set socket listeners
 
+	socket.on("cancelMatch", onCancelMatchResponse);
+	socket.on("findMatch", onFindMatchResponse);
+	socket.on("gameFound", onGameFound);
+	socket.on("progress", onAddprogress);
+	socket.on("question", onQuestionRecieved);
+	socket.on("answer", onAnswerRecieved);
+
+
 });
 
 
@@ -49,11 +57,11 @@ function mousePressed() {
 }
 
 
-function getSize(scale, direction){
+function getSize(percent, direction){
 	if (direction == 0) {
-		return scale * width;
+		return percent * width;
 	} else {
-		return scale * height;
+		return percent * height;
 	}
 }
 
@@ -75,9 +83,6 @@ function MainMenu() {
 
 		this._mouseHandler = new MouseHandler();
 		this._mouseHandler.addRegion(this.findMatchRegion);
-
-		
-
 
 
 	}
@@ -268,15 +273,47 @@ function GameScene() {
 		this.tick = 0;
 		this.endGameTick = 0;
 		this.isGameReady = true;
+		this.gameRunning = true;
 		this.endGame = false;
 
 		this._mouseHandler = new MouseHandler();
 		this.questionHolder = new QuestionHolder();
+		var thisInsatnce = this;
 
 		//instantiate input
+		var ciWidth = 250/1920;
 		this.ci = new CanvasInput({
-			canvas: document.getElementById(c.canvas.id)
+			canvas: document.getElementById(c.canvas.id),
+			x: getSize(0.5 - 0.5*ciWidth, 0),
+			width: getSize(ciWidth, 0),
+			y: getSize(0.8, 1),
+			onsubmit: function(){
+				answerQuestion(this.value(), thisInsatnce.questionHolder.getCurrentQuestion().id);
+				this.value("");
+			}
 		});
+
+		//instantiate regions for showing questions
+		this.questionRegions = [];
+		var thisInsatnce = this;
+		for (var i = 0; i < this.game.questionLength; i++) {
+			var r = new Region(
+				getSize(0.2 , 0) + i * getSize(128/1920, 0), getSize(0.05 , 1), 
+				getSize(40/1920, 0), getSize(40/1920, 0), {i: i}
+			);
+
+			r.onclick = function () {
+				//var i2 = JSON.parse(JSON.stringify(i))
+				
+				//console.log(this.extras.i);
+				if (typeof thisInsatnce.questionHolder.questions[this.extras.i] != "undefined") {
+					thisInsatnce.questionHolder.showQuestion(this.extras.i);
+				}	
+			}
+
+			this.questionRegions.push(r);
+			this._mouseHandler.addRegion(r);
+		}
 
 	}
 
@@ -301,27 +338,76 @@ function GameScene() {
 			//Draw building relative to its i;
 			if (i < this.buildings.length) {
 				image(this.buildings[i], getSize(0.01 + 0.08 * i, 0), getSize(0.9, 1), getSize(0.08, 0), getSize(0.08, 1), 0,0);
+			}	
+		}
+
+		for (var i = 0; i < this.game.player1.progress; i++) {
+			//Draw building relative to its i;
+			if (i < this.buildings.length) {
+				image(this.buildings[i], getSize(0.91 - 0.08 * i, 0), getSize(0.9, 1), getSize(0.08, 0), getSize(0.08, 1), 0,0);
 			}
 			
 		}
 
 		
 		
-
-		//show the input if the game is running
 		if (this.gameRunning) {
+			var thisQuestion = this.questionHolder.getCurrentQuestion();
 			//draw question
+			if (typeof thisQuestion != "undefined") {
+				push();
+				imageMode(CENTER);
+				image(thisQuestion.img, getSize(0.5, 0), getSize(0.45, 1), getSize(750/1920,0), getSize(750/1920,0));
+				pop();
+			}
 
-			image(this.questionHolder.questions[this.questionHolder.showingQuestion].img);
+			
 
-			if (this.questionHolder.unAnswered == this.questionHolder.showingQuestion) {
-				//draw input
-				this.ci.render();
+			if (typeof thisQuestion != "undefined" ) {
+				//draw input if the question is not answered
+				!thisQuestion.isAnswered ? this.ci.render() : void(0);
+				
+				
 			}
 
 			//draw answer
 			
+			if (typeof thisQuestion != "undefined") {
 
+				push();
+				var txtSize = 48;
+				textSize(getSize(txtSize/1920, 0)); 
+				if (thisQuestion.answer != null) {
+					text("det rigtige svar er: " + thisQuestion.answer, getSize(0.1,0), getSize(0.8, 1));
+				}
+
+				if (thisQuestion.userAnswer != null) {
+					//console.log(1232);
+					text("du svarede: " + thisQuestion.userAnswer, getSize(0.1,0), getSize(0.8, 1) + getSize((txtSize+4)/1920, 0));
+				}
+				pop();
+			}
+		}
+
+		//draw numbers to switch betweeen questions
+		for (var i = 0; i < this.questionRegions.length; i++) {
+			var qr = this.questionRegions[i];
+			push();
+
+			if (typeof this.questionHolder.questions[i] == "undefined") {
+				fill(100);
+			} else if(this.questionHolder.showingQuestion == i) {
+				fill(0, 255, 0);
+			} else {
+				fill(255, 255, 0);
+			}
+			textAlign(LEFT, TOP);
+			textSize(32);
+			var extra = getSize(4/1920,0);
+			text(i, qr.x + extra, qr.y+ extra);
+
+			pop();
+			
 		}
 
 
@@ -454,6 +540,7 @@ function onAnswerRecieved(data) {
 }
 
 function answerQuestion(answer, qId){
+	console.log(answer, qId);
 	//set the user answer on a question to the answer
 	mgr.scene.oScene.questionHolder.setUserAnswer(answer, qId);
 
@@ -468,7 +555,6 @@ function QuestionHolder() {
 	//constructor
 	this.questions = [];
 	this.showingQuestion = 0;
-	this.unAnswered = 0;
 }
 
 QuestionHolder.prototype.addQuestion = function(question) {
@@ -479,6 +565,10 @@ QuestionHolder.prototype.addQuestion = function(question) {
 QuestionHolder.prototype.showQuestion = function(questionNumber) {
 	this.showingQuestion = questionNumber;
 	return this;
+};
+
+QuestionHolder.prototype.getCurrentQuestion = function() {
+	return this.questions[this.showingQuestion];
 };
 
 QuestionHolder.prototype.getQuestion = function(id) {
@@ -495,8 +585,8 @@ QuestionHolder.prototype.setAnswer = function(answer, id) {
 };
 
 QuestionHolder.prototype.setUserAnswer = function(answer, id) {
+
 	this.getQuestion(id).setUserAnswer(answer);
-	this.unAnswered++;
 };
 
 
@@ -512,7 +602,7 @@ function Question(img, qId) {
 }
 
 Question.prototype.setUserAnswer = function(answer) {
-	this.setUserAnswer = answer;
+	this.userAnswer = answer;
 	this.isAnswered = true;
 };
 
@@ -537,12 +627,13 @@ MathGamePlayer.prototype.addProgress = function() {
 
 
 
-function Region(x,y,width, height) {
+function Region(x,y,width, height, extras) {
 	//constuctor
 	this.x = x;
 	this.y = y;
 	this.w = width;
 	this.h = height;
+	this.extras = extras;
 }
 
 Region.prototype.isInside = function() {
@@ -600,12 +691,22 @@ MouseHandler.prototype.removeRegion = function(id) {
 
 MouseHandler.prototype.onClick = function(x,y) {
 	//check all regions if the click was inside one of them
+	//console.log("user clicked at x: " + x + " y: " + y);
 	for (var i = this.regions.length - 1; i >= 0; i--) {
 		if (typeof this.regions[i].onclick == "function") {
 			if (this.regions[i].isInside()) {
+				//console.log("user clicked inside region: " + i);
 				this.regions[i].onclick();
 			}
 		}
 	}
 };
 
+
+
+
+
+/*
+TODO:
+tegn hegn
+*/
