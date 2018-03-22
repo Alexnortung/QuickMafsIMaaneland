@@ -18,15 +18,10 @@ $(function() {
   $("#registerButton").click(function() {
     Register();
   });
- ///BULLLLLLLLSHIIIIIIITTTTTTT
+
   $("#loginButton").click(function() {
     Login();
     console.log("Login initiated");
-  });
-
-  socket.on("Questions", function(msg)
-  {
-    console.log(msg);
   });
 
   socket.on("registerResult", function(msg) {

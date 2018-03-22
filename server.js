@@ -43,11 +43,6 @@ io.on('connection', function(socket)
 {
   connections.push(socket);
   console.log("There are %s connections", connections.length);
-  var sql = sqlS.FindQuestion(con, function(sql)
-  {
-    io.emit("Questions", sql);
-    console.log("sql: " + sql);
-  });
 
 /*
   socket.on('register', function(registerArray)
