@@ -67,7 +67,7 @@ Init.prototype.findGame = function(socket, gameType) {
         this.users[socket.id].inqueue = true;
         preparedRes.status = "q";
         preparedRes.message = "You are in the queue"; /*preparedRes.q = this.queue;*/
-        socket.emit("findMathGame1v1", preparedRes);
+        socket.emit("findMatch", preparedRes);
     } else {
         var queueDetails = this.queue[queueNumber];
         this.queue.splice(queueNumber, 1);
