@@ -1,5 +1,6 @@
 <html>
 
+
   <head>
     <meta charset="UTF-8">
     <title>title</title>
@@ -14,30 +15,37 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript" src="js/game.js"></script>
-    <!--<script src="js/game.js"></script>-->
     <script src="js/site.js"></script>
   </head>
 
-  <body>
-    <div id="overlay">
-      <div id="loginOverlay">
-        <p><label class="label" for="sharepoint-company-name">Username</label><br><input type="text" class="input" id="username" placeholder="Username" /></p>
-        <p><label class="label" for="sharepoint-company-name">Password</label><br><input type="text" class="input" id="password" placeholder="Password" /></p>
-        <p><label class="label" for="sharepoint-company-name">Re-type Password</label><br><input type="text" class="input" id="repassword" placeholder="Re-type password" /></p>
-        <p><label class="label" for="sharepoint-company-name">E-mail</label><br><input type="text" class="input" id="email" placeholder="E-mail" /></p>
-        <p><label class="label" for="sharepoint-company-name">Display name</label><br><input type="text" class="input" id="displayname" placeholder="Display name" /></p>
-        <button id="registerButton" class="button">Register</button>
-      </div>
-      <div id="registerOverlay"></div>
+<body>
+  <div id="overlay">
+    <div id="registerOverlay">
+      <span class="CloseOverlay">✘<!-- Maybe use ❌ --></span>
+      <p><label class="label" for="sharepoint-company-name">Username</label><br><input type="text" class="input" id="username" placeholder="Username" /></p>
+      <p><label class="label" for="sharepoint-company-name">Password</label><br><input type="password" class="input" id="password" placeholder="Password" /></p>
+      <p><label class="label" for="sharepoint-company-name">Re-type Password</label><br><input type="password" class="input" id="repassword" placeholder="Re-type password" /></p>
+      <p><label class="label" for="sharepoint-company-name">E-mail</label><br><input type="email" class="input" id="email" placeholder="E-mail" /></p>
+      <p><label class="label" for="sharepoint-company-name">Display name</label><br><input type="text" class="input" id="displayname" placeholder="Display name" /></p>
+      <button id="registerButton" class="button">Register</button>
     </div>
 
+    <div id="loginOverlay">
+      <span class="CloseOverlay">✘</span>
+      <p><label class="label" for="sharepoint-company-name">Username</label><br><input type="text" class="input" id="loginusername" placeholder="Username" /></p>
+      <p><label class="label" for="sharepoint-company-name">Password</label><br><input type="password" class="input" id="loginpassword" placeholder="Password" /></p>
+      <button id="loginButton" class="button">Login</button>
+    </div>
+  </div>
 
-  <ul>
+
+  <ul id="header">
     <li id="login"><a>Login</a></li>
     <li id="register"><a>Register</a></li>
   </ul>
     <div id="canvasContainer"></div>
     <!--canvas id="gameCanvas" width="800" height="800" style="border: 1px solid black;"></canvas-->
+
 
   </body>
 
