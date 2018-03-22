@@ -11,6 +11,10 @@ $(function() {
     console.log("Register");
   });
 
+  $("#queButton").click(function() {
+    QueueUp();
+  });
+
   $("#registerButton").click(function() {
     Register();
   });
@@ -23,6 +27,11 @@ $(function() {
   socket.on("registerResult", function(msg) {
     console.log("Register Status: " + msg);
 
+  });
+
+  socket.on("findMathGame1v1", function (msg)
+  {
+    console.log(msg);
   });
 
   socket.on("LoggedMenu", function(username)
@@ -84,4 +93,10 @@ function GetLoginCredentials() {
 
 function Login() {
   socket.emit('login', GetLoginCredentials());
+}
+
+function QueueUp()
+{
+  socket.emit('findMathGame');
+  console.log("Quing Up");
 }

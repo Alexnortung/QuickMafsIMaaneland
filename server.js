@@ -6,6 +6,7 @@ var mysql = require('mysql');
 var io = require('socket.io')(http);
 var sqlS = require('./sqlSetup.js');
 var crypt = require('./passwordCrypt.js');
+var queue = require('./Queue.js');
 
 app.use("/", express.static(__dirname + "/game"));
 
@@ -17,14 +18,16 @@ sqlS.SetupMySqldev(mysql, function()
   sqlS.CreateMatchesTable(con);
 });
 
+var connections = [];
+
+var init = new queue.Init(io);
+
 io.on('connection', function(socket)
 {
-  console.log(socket.username + " Logged in");
-  if (typeof socket.login !== "undefined")
-  {
-    socket.emit("LoggedMenu", socket.username);
-  }
 
+  connections.push(socket);
+  console.log("There are %s connections", connections.length);
+/*
   socket.on('register', function(registerArray)
   {
     console.log("Consoled");
@@ -34,6 +37,11 @@ io.on('connection', function(socket)
     });
   });
 
+  socket.on('findMathGame', function()
+  {
+    queue.findGame(socket, "1v1");
+  });
+
   socket.on('login', function(LoginObject)
   {
     login(LoginObject.username, LoginObject.password, socket, function()
@@ -41,11 +49,12 @@ io.on('connection', function(socket)
       console.log("Inside Here?");
       console.log(socket.username + " Just logged in");
     });
-  });
+  });*/
 
   socket.on('disconnect', function()
   {
-  console.log('username disconnected');
+    connections.splice(connections.indexOf(socket), 1);
+    console.log("There are %s connections", connections.length);
   });
 });
 
