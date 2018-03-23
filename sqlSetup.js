@@ -110,7 +110,7 @@ exports.CreateQuestions = function(con, callback) {
 }
 
 exports.CreateSubQuestions = function(con, callback) {
-  con.query("CREATE TABLE IF NOT EXISTS subQuestions (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, `questionId` INT(255), `picturePath` varchar(255), `answer` varchar(255));", function(err, result) {
+  con.query("CREATE TABLE IF NOT EXISTS subQuestions (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, `questionId` INT(255), `imgPath` varchar(255), `answer` varchar(255));", function(err, result) {
     if (err) {
       console.log("Error: " + err);
     } else {
@@ -125,15 +125,15 @@ exports.CreateQuestionAndSubQuestions = function(con, callback) {
       if (err) {
         console.log("Error: " + err);
       } else {
-        con.query("INSERT INTO subQuestions (questionId, picturePath, answer) VALUES (1, 'pictures/img1.png', '42');", function(err, result) {
+        con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'pictures/img1.png', '42');", function(err, result) {
             if (err) {
               console.log("Error: " + err);
             } else {
-              con.query("INSERT INTO subQuestions (questionId, picturePath, answer) VALUES (1, 'pictures/img2.png', '43');", function(err, result) {
+              con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'pictures/img2.png', '43');", function(err, result) {
                   if (err) {
                     console.log("Error: " + err);
                   } else {
-                    con.query("INSERT INTO subQuestions (questionId, picturePath, answer) VALUES (1, 'pictures/img3.png', '44');", function(err, result) {
+                    con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'pictures/img3.png', '44');", function(err, result) {
                       if (err) {
                         console.log("Error: " + err);
                       } else {
