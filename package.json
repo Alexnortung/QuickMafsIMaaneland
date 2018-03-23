@@ -4,6 +4,7 @@
   "description": "Desc",
   "main": "server.js",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "express": "^4.16.2",
     "mysql": "^2.15.0",
     "npm": "^5.6.0",
