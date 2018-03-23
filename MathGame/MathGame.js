@@ -19,7 +19,7 @@ MathGame.prototype.addProgress = function (playerInt) {
 		//this player has won!
 		//end the game by telling who won the game
 		if (typeof this.callback == "function") {
-			this.callback();
+			this.callback(playerInt);
 		}	
 	}
 }
