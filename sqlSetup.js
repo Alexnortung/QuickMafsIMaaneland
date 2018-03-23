@@ -114,7 +114,7 @@ exports.CreateMatchesTable = function (con)
 
 function DeleteDB(con, callback)
 {
-  con.query("drop database quickmafs;", function (err, result)
+  con.query("drop database IF EXISTS quickmafs;", function (err, result)
   {
     if (err)
     {
