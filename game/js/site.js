@@ -18,7 +18,7 @@ $(function() {
   $("#registerButton").click(function() {
     Register();
   });
- ///BULLLLLLLLSHIIIIIIITTTTTTT
+
   $("#loginButton").click(function() {
     Login();
     console.log("Login initiated");

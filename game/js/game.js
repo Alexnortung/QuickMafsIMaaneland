@@ -27,10 +27,9 @@ $(function ()
 var mgr;
 
 function setup() {
-	console.log("henlo world!");
 	c = createCanvas(1920*0.6,1080*0.6);
-	
-	
+
+
 
 	$(c.canvas.id).appendTo("#canvasContainer");
 
@@ -78,7 +77,7 @@ function MainMenu() {
 		}
 		this.cancelMatchRegion = new Region(getSize(0.7, 0), getSize(0.75, 1), getSize(0.2, 0), getSize(0.175, 1));
 		this.cancelMatchRegion.onClick = function () {
-			
+
 		}
 
 		this._mouseHandler = new MouseHandler();
@@ -92,7 +91,7 @@ function MainMenu() {
 	this.draw = function() {
 		//background
 		background(this.bg);
-		
+
 
 		//queue for match button else cancel box
 		//box
@@ -113,7 +112,7 @@ function MainMenu() {
 			textSize(getSize(0.05, 1));
 			text("Cancel", getSize(0.735, 0), getSize(0.85, 1));
 		}
-		
+
 		pop();
 		//text
 
@@ -250,7 +249,7 @@ function onChallengeRecieved(data) {
 }
 
 function onChallengeResponse(data) {
-	//data should be an object with an accepted key as a boolean of the other payer accepted  
+	//data should be an object with an accepted key as a boolean of the other payer accepted
 }
 
 function onConnectAndGame(){
@@ -306,17 +305,17 @@ function GameScene() {
 		var thisInsatnce = this;
 		for (var i = 0; i < this.game.questionLength; i++) {
 			var r = new Region(
-				getSize(0.2 , 0) + i * getSize(128/1920, 0), getSize(0.05 , 1), 
+				getSize(0.2 , 0) + i * getSize(128/1920, 0), getSize(0.05 , 1),
 				getSize(40/1920, 0), getSize(40/1920, 0), {i: i}
 			);
 
 			r.onclick = function () {
 				//var i2 = JSON.parse(JSON.stringify(i))
-				
+
 				//console.log(this.extras.i);
 				if (typeof thisInsatnce.questionHolder.questions[this.extras.i] != "undefined") {
 					thisInsatnce.questionHolder.showQuestion(this.extras.i);
-				}	
+				}
 			}
 
 			this.questionRegions.push(r);
@@ -346,7 +345,7 @@ function GameScene() {
 			//Draw building relative to its i;
 			if (i < this.buildings.length) {
 				image(this.buildings[i], getSize(0.01 + 0.08 * i, 0), getSize(0.9, 1), getSize(0.08, 0), getSize(0.08, 1), 0,0);
-			}	
+			}
 		}
 
 		for (var i = 0; i < this.game.player1.progress; i++) {
@@ -354,11 +353,11 @@ function GameScene() {
 			if (i < this.buildings.length) {
 				image(this.buildings[i], getSize(0.91 - 0.08 * i, 0), getSize(0.9, 1), getSize(0.08, 0), getSize(0.08, 1), 0,0);
 			}
-			
+
 		}
 
-		
-		
+
+
 		if (this.gameRunning) {
 			var thisQuestion = this.questionHolder.getCurrentQuestion();
 			//draw question
@@ -369,22 +368,22 @@ function GameScene() {
 				pop();
 			}
 
-			
+
 
 			if (typeof thisQuestion != "undefined" ) {
 				//draw input if the question is not answered
 				!thisQuestion.isAnswered ? this.ci.render() : void(0);
-				
-				
+
+
 			}
 
 			//draw answer
-			
+
 			if (typeof thisQuestion != "undefined") {
 
 				push();
 				var txtSize = 48;
-				textSize(getSize(txtSize/1920, 0)); 
+				textSize(getSize(txtSize/1920, 0));
 				if (thisQuestion.answer != null) {
 					text("det rigtige svar er: " + thisQuestion.answer, getSize(0.1,0), getSize(0.8, 1));
 				}
@@ -415,7 +414,7 @@ function GameScene() {
 			text(i, qr.x + extra, qr.y+ extra);
 
 			pop();
-			
+
 		}
 
 
@@ -437,12 +436,12 @@ function GameScene() {
 				mgr.scene.setupExecuted = false;
 				mgr.showScene(MainMenu);
 
-				
+
 			}
 			this.endGameTick++;
 		}
 		this.tick++;
-		
+
 	}
 
 }
@@ -460,6 +459,7 @@ function MathGame(player0, player1, questionLength, callback){
 	this.questionLength = questionLength;
 	this.callback = callback;
 	
+
 }
 
 MathGame.prototype.setPlayerName = function(playerInt, name) {
@@ -475,6 +475,7 @@ MathGame.prototype.addProgress = function (playerInt) {
 		if (typeof this.callback == "function") {
 			this.callback();
 		}	
+
 	}
 }
 
@@ -505,7 +506,7 @@ function onGameData(data) {
 					mgr.scene.oScene.game[key] = d1.gameData[key];
 				});
 			}
-			
+
 		}
 	}, 500);
 }
@@ -546,13 +547,13 @@ function onQuestionRecieved(data) {
 
 function onAnswerRecieved(data) {
 	/* data should be an object with:
-	answer: Number 
+	answer: Number
 	qId: Number (the id of the question)
 	*/
 	var d1 = checkData(data);
 	if (d1 == false) {
 		return;
-	} 
+	}
 
 	mgr.scene.oScene.questionHolder.setAnswer(d1.answer, d1.qId);
 }
@@ -679,7 +680,7 @@ MouseHandler.prototype.addRegion = function(region) {
 		var regionId = this.getNewRID;
 		region.id = regionId;
 	}
-	
+
 	this.regions.push(region);
 	return region;
 };
