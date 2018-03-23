@@ -44,7 +44,7 @@ Init.prototype.findGame = function(socket, gameType) {
     }
     else
     {
-      console.log(socket.id + " neither queued nor already in game");
+      console.log(socket.id + " will now be queued");
     }
 
     if (typeof this.queue[0] !== "undefined") {
@@ -66,7 +66,7 @@ Init.prototype.findGame = function(socket, gameType) {
         });
         this.users[socket.id].inqueue = true;
         preparedRes.status = "q";
-        preparedRes.message = "You are in the queue"; /*preparedRes.q = this.queue;*/
+        preparedRes.message = "You are in the queue"; //preparedRes.q = this.queue;
         socket.emit("findMatch", preparedRes);
     } else {
         var queueDetails = this.queue[queueNumber];
@@ -81,14 +81,15 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
         gameId = this.currentGame;
     }
     for (i = 0; i < players.length; i++) {
-        players[i].join("game" + this.currentGame);
+        //console.log("player"+i+ " joined " + this.currentGame);
+        players[i].join("game" + gameId);
         this.users[players[i].id].inqueue = false;
         this.users[players[i].id].ingame = true;
         this.users[players[i].id].gameType = gameType;
         this.users[players[i].id].gameID = gameId;
     }
 
-    this.io.to("game" + this.currentGame).emit('findMathGame1v1', 'GameFound');
+    
 
     var preparedGame = {};
     var thisInstance = this;
@@ -99,7 +100,10 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
     }
     preparedGame.gameType = gameType;
     preparedGame.players = players;
-    this.games[this.currentGame] = preparedGame; /*this.io.to("game" + this.currentGame).emit("start", "game started");*/
+    this.games[gameId] = preparedGame; /*this.io.to("game" + this.currentGame).emit("start", "game started");*/
+    //console.log("gameid: " + gameId);
+    this.io.to("game" + gameId).emit('gameFound', preparedGame.preparedRes);
+
     this.currentGame++;
 };
 
@@ -271,7 +275,7 @@ Init.prototype.socketHandler = function(socket) {
               }
           }
       }
-      if (thisInstance.users[socket.id].ingame && thisInstance.games[thisInstance.users[socket.id].gameID].gameType == gamesTypes[0]) {
+      if (thisInstance.users[socket.id].ingame && thisInstance.games[thisInstance.users[socket.id].gameID].gameType == gamesTypes[1]) {
           if (thisInstance.users[socket.id].gameData.token == "circle") {
               thisInstance.games[thisInstance.users[socket.id].gameID].game.end("cross");
           } else {
@@ -284,8 +288,9 @@ Init.prototype.socketHandler = function(socket) {
 }
 
 
-function Init(io) {
+function Init(io, dbCon) {
     this.io = io;
+    this.dbCon = dbCon;
     this.queue = [];
     this.games = {};
     this.users = {};
@@ -298,22 +303,46 @@ function Init(io) {
 }
 
 Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privateGame) {
-    
+    var thisInstance = this;
+    //get question
+     
+
+    var questionLength = 3;
+    var preRes = {
+      player0: players[0].id,
+      player1: players[1].id,
+      questionLength: questionLength
+    }
+    preparedGame.preparedRes = preRes;
+    preparedGame.game = new MathGame(players[0], players[1], questionLength, function(winner) {
+        // callback
+        this.endGame(winner, gameId);
+
+    });
 };
+
+Init.prototype.endGame = function(winner, gameId) {
+    // body...
+    var thisInstance = this;
+    var preparedEmitEnd = {};
+    preparedEmitEnd.winner = winner;
+    thisInstance.io.to("game" + gameId).emit("endGame", preparedEmitEnd);
+    for (i = 0; i < thisInstance.games[gameId].players.length; i++) {
+        var thisPlayerId = thisInstance.games[gameId].players[i].id;
+        thisInstance.users[thisPlayerId].ingame = false;
+        thisInstance.users[thisPlayerId].gameID = null;
+        thisInstance.users[thisPlayerId].gameData = {};
+    }
+    delete thisInstance.games[gameId];
+
+};
+
+
 
 Init.prototype.preStartttt = function(players, preparedGame, gameId, privateGame) {
     var thisInstance = this;
     preparedGame.game = new ttt.Game(players[0], function(winner) {
-        var preparedEmitEnd = {};
-        preparedEmitEnd.winner = winner;
-        thisInstance.io.to("game" + gameId).emit("endGame", preparedEmitEnd);
-        for (i = 0; i < thisInstance.games[gameId].players.length; i++) {
-            var thisPlayerId = thisInstance.games[gameId].players[i].id;
-            thisInstance.users[thisPlayerId].ingame = false;
-            thisInstance.users[thisPlayerId].gameID = null;
-            thisInstance.users[thisPlayerId].gameData = {};
-        }
-        delete thisInstance.games[gameId];
+        this.endGame(winner, gameId);
     });
     this.users[players[0].id].gameData.token = "cross";
     if (privateGame) {

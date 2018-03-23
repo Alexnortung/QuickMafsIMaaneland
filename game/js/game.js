@@ -177,6 +177,7 @@ function onFindMatchResponse(data) {
 	/*data is an object that has:
 	status: Boolean (true if the player is now in a queue)
 	//*/
+	console.log(data);
 	var d1 = checkData(data);
 	if (d1 == false) {
 		return;
@@ -217,13 +218,16 @@ function checkData(data) {
 
 function onGameFound(data) {
 	//data should be a JSON object containing:
-	//gameData: an object with game data
+	//player0: string
+	//player1: string
+	//questionLength: number
+	console.log(data);
 	var d1 = checkData(data);
 	if (d1 == false) {
 		return;
 	}
 
-	currentGame = new MathGame(d1.player0, d1.player1, d1.questionLength, () => {
+	currentGame = new MathGame(d1.player0, d1.player1, d1.questionLength, (playerInt) => {
 		//callback, fires when there has been found a winner
 		var tScene = mgr.scene.oScene
 		
