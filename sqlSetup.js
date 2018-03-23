@@ -82,9 +82,13 @@ exports.CreateMatchesTable = function(con) {
   });
 }
 
-function DeleteDB(con, callback) {
-  con.query("drop database quickmafs;", function(err, result) {
-    if (err) {
+function DeleteDB(con, callback)
+{
+  con.query("drop database IF EXISTS quickmafs;", function (err, result)
+  {
+    if (err)
+    {
+
       console.log("Error: " + err);
       callback();
     } else {

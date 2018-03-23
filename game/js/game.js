@@ -176,6 +176,7 @@ function onFindMatchResponse(data) {
 	/*data is an object that has:
 	status: Boolean (true if the player is now in a queue)
 	//*/
+	console.log(data);
 	var d1 = checkData(data);
 	if (d1 == false) {
 		return;
@@ -210,21 +211,28 @@ function checkData(data) {
 		console.log("response is not an object", data);
 		return false;
 	}
-
 	return data;
-
 }
 
 
 function onGameFound(data) {
 	//data should be a JSON object containing:
-	//gameData: an object with game data
+	//player0: string
+	//player1: string
+	//questionLength: number
+	console.log(data);
 	var d1 = checkData(data);
 	if (d1 == false) {
 		return;
 	}
 
-	currentGame = new MathGame(d1.player0, d1.player1, d1.questionLength);
+	currentGame = new MathGame(d1.player0, d1.player1, d1.questionLength, (playerInt) => {
+		//callback, fires when there has been found a winner
+		var tScene = mgr.scene.oScene
+		
+		tScene.winner = this.players[playerInt];
+		tScene.endGame = true;
+	});
 	//change scene to Game
 
 	mgr.showScene(GameScene, currentGame);
@@ -444,11 +452,13 @@ GameScene.prototype.mousePress = function () {
 
 
 
-function MathGame(player0, player1, questionLength){
+function MathGame(player0, player1, questionLength, callback){
 	this.player0 = new MathGamePlayer(player0);
 	this.player1 = new MathGamePlayer(player1);
 	this.players = [this.player0, this.player1];
 	this.questionLength = questionLength;
+	this.callback = callback;
+	
 
 }
 
@@ -462,14 +472,24 @@ MathGame.prototype.addProgress = function (playerInt) {
 	if (this.players[playerInt].progress == this.questionLength) {
 		//this player has won!
 		//end the game by telling who won the game
-		var tScene = mgr.scene.oScene
-
-		tScene.winner = this.players[playerInt];
-		tScene.endGame = true;
-
+		if (typeof this.callback == "function") {
+			this.callback();
+		}	
 
 	}
 }
+
+
+function MathGamePlayer(name) {
+	//constructor
+	this.name = name;
+	this.progress = 0;
+}
+
+MathGamePlayer.prototype.addProgress = function() {
+	this.progress++;
+};
+
 
 function onGameData(data) {
 	/* data should be an object that contains:
@@ -611,15 +631,7 @@ Question.prototype.setAnswer = function(answer) {
 
 
 
-function MathGamePlayer(name) {
-	//constructor
-	this.name = name;
-	this.progress = 0;
-}
 
-MathGamePlayer.prototype.addProgress = function() {
-	this.progress++;
-};
 
 
 
