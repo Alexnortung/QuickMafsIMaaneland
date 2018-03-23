@@ -236,6 +236,7 @@ function onGameFound(data) {
 	//change scene to Game
 
 	mgr.showScene(GameScene, currentGame);
+	socket.emit("startedGame");
 
 
 }

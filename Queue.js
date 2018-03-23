@@ -1,5 +1,7 @@
 //var ttt = require("./Krydsogbolle/Game.js");
 var MathGame = require("./MathGame/MathGame.js").MathGame;
+var sqlS = require('./sqlSetup.js');
+
 var gamesTypes = ["1v1", "ttt"];
 
 function checkData(data) {
@@ -44,7 +46,7 @@ Init.prototype.findGame = function(socket, gameType) {
     }
     else
     {
-      console.log(socket.id + " will now be queued");
+        //console.log(socket.id + " will now be queued");
     }
 
     if (typeof this.queue[0] !== "undefined") {
@@ -93,18 +95,27 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
 
     var preparedGame = {};
     var thisInstance = this;
-    if (gameType == "ttt") {
-        this.preStartttt(players, preparedGame, gameId, privateGame);
-    } else if (gameType == "1v1") {
-        this.preStartMathGame(players, preparedGame, gameId, privateGame);
-    }
-    preparedGame.gameType = gameType;
-    preparedGame.players = players;
-    this.games[gameId] = preparedGame; /*this.io.to("game" + this.currentGame).emit("start", "game started");*/
-    //console.log("gameid: " + gameId);
-    this.io.to("game" + gameId).emit('gameFound', preparedGame.preparedRes);
+    var promise = new Promise(( resolve, reject) => {
+        if (gameType == "ttt") {
+            this.preStartttt(players, preparedGame, gameId, privateGame);
+        } else if (gameType == "1v1") {
+            this.preStartMathGame(players, preparedGame, gameId, privateGame, () =>{
+                resolve();
+            });
+        }
+    });
 
-    this.currentGame++;
+    promise.then(() => {
+        preparedGame.gameType = gameType;
+        preparedGame.players = players;
+        this.games[gameId] = preparedGame; /*this.io.to("game" + this.currentGame).emit("start", "game started");*/
+        //console.log("gameid: " + gameId);
+        this.io.to("game" + gameId).emit('gameFound', preparedGame.preparedRes);
+
+        this.currentGame++;
+    });
+    
+    
 };
 
 
@@ -132,11 +143,16 @@ Init.prototype.tttHandler = function(data, socket) {
 
 
 Init.prototype.mathGameHandler = function(data, socket) {
-    var d1 = checkData(data);
-    if (d1 != false) {
-        if (d1.action == "answer") {
-
+    if (data.action == "answer") {
+        var cGame = thisInstance.games[thisInstance.users[socket.id].gameID];
+        var cPlayer;
+        for (var i = cGame.players.length - 1; i >= 0; i--) {
+            if(cGame.players[i].id == socket.id){
+                cPlayer = cGame.players[i]
+            }
         }
+        var question = cGame.game.questionResults[1][cPlayer.progress];
+        
     }
 };
 
@@ -187,6 +203,18 @@ Init.prototype.socketHandler = function(socket) {
 
       thisInstance.findGame(socket, "1v1");
     });
+
+    socket.on("startedGame", function(data) {
+        //send question
+        var question = thisInstance.games[thisInstance.users[socket.id].gameID]
+        .questionResults[1][0];
+        socket.emit("question", {
+            img: question.imgPath,
+            qId: question.id
+        });
+    });
+
+
 
 
     socket.on("createPrivateGame", function(data) {
@@ -247,22 +275,27 @@ Init.prototype.socketHandler = function(socket) {
       }
     });
     socket.on("gameAction", function(data) {
-      socket.emit("debug", data);
-      if (thisInstance.users[socket.id].ingame) {
-          if (thisInstance.users[socket.id].gameType == "ttt") {
-              thisInstance.tttHandler(data, socket);
-          } else if (thisInstance.users[socket.id].gameType == "1v1") {
-            thisInstance.mathGameHandler(data, socket);
-          }
+
+    socket.emit("debug", data);
+        var data = checkData(data);
+        if (data == false) {
+            return;
+        }
+        if (thisInstance.users[socket.id].ingame) {
+            if (thisInstance.users[socket.id].gameType == "ttt") {
+                thisInstance.tttHandler(data, socket);
+            } else if (thisInstance.users[socket.id].gameType == "1v1") {
+                thisInstance.mathGameHandler(data, socket);
+            }
 
 
 
-      } else {
-          var preparedRes = {};
-          preparedRes.status = "not ok";
-          preparedRes.message = "you are not in a game";
-          socket.emit("gameUpdate", preparedRes);
-      }
+        } else {
+            var preparedRes = {};
+            preparedRes.status = "not ok";
+            preparedRes.message = "you are not in a game";
+            socket.emit("gameUpdate", preparedRes);
+        }
     });
     socket.on("disconnect", function() {
       if (thisInstance.users[socket.id].inqueue) {
@@ -302,23 +335,38 @@ function Init(io, dbCon) {
     });
 }
 
-Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privateGame) {
+Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privateGame, callback) {
     var thisInstance = this;
+    var promise = new Promise((resolve, reject) => {
+        sqlS.FindQuestion(this.dbCon, function(results) {
+            //console.log(results);
+            resolve(results);
+        });
+    })
     //get question
+    promise.then((results) => {
+
+        preparedGame.questionResults = results;
+
+        var questionLength = results[1].length;
+        var preRes = {
+            player0: players[0].id,
+            player1: players[1].id,
+            questionLength: questionLength
+        }
+
+        preparedGame.preparedRes = preRes;
+        preparedGame.game = new MathGame(players[0], players[1], questionLength, function(winner) {
+            // callback
+            this.endGame(winner, gameId);
+
+        });
+        callback();
+    });
+    
      
 
-    var questionLength = 3;
-    var preRes = {
-      player0: players[0].id,
-      player1: players[1].id,
-      questionLength: questionLength
-    }
-    preparedGame.preparedRes = preRes;
-    preparedGame.game = new MathGame(players[0], players[1], questionLength, function(winner) {
-        // callback
-        this.endGame(winner, gameId);
-
-    });
+    
 };
 
 Init.prototype.endGame = function(winner, gameId) {
