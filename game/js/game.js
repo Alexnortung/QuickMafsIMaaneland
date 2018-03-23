@@ -536,9 +536,10 @@ function onQuestionRecieved(data) {
 	if (d1 == false) {
 		return;
 	}
+	var imgPath = "img/questions/" + d1.img
 
 	//instantiate the question
-	var q = new Question(d1.img, d1.qId);
+	var q = new Question(imgPath, d1.qId);
 
 	//add the question to the question holder
 	mgr.scene.oScene.questionHolder.addQuestion(q);

@@ -29,6 +29,8 @@ function MathGamePlayer(name) {
 	//constructor
 	this.name = name;
 	this.progress = 0;
+	this.wrong = 0;
+	this.right = 0;
 }
 
 MathGamePlayer.prototype.addProgress = function() {
