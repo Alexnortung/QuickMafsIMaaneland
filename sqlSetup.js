@@ -125,15 +125,15 @@ exports.CreateQuestionAndSubQuestions = function(con, callback) {
       if (err) {
         console.log("Error: " + err);
       } else {
-        con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'pictures/img1.png', '42');", function(err, result) {
+        con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'img1.png', '42');", function(err, result) {
             if (err) {
               console.log("Error: " + err);
             } else {
-              con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'pictures/img2.png', '43');", function(err, result) {
+              con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'img2.png', '43');", function(err, result) {
                   if (err) {
                     console.log("Error: " + err);
                   } else {
-                    con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'pictures/img3.png', '44');", function(err, result) {
+                    con.query("INSERT INTO subQuestions (questionId, imgPath, answer) VALUES (1, 'img3.png', '44');", function(err, result) {
                       if (err) {
                         console.log("Error: " + err);
                       } else {
