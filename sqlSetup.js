@@ -1,11 +1,13 @@
+// Function KUN BRUGT UNDER DEVELOPMENT Sletter alle databaser
 exports.SetupMySqldev = function(mysql, callback) {
+  // Laver en connection
   var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "klat9"
   });
 
-
+  //Sletter det hele
   con.connect(function(err) {
     if (err) {
       console.log("Couldnt connect: " + err);
@@ -25,6 +27,7 @@ exports.SetupMySqldev = function(mysql, callback) {
   });
 }
 
+// FUNCTION laver en connection til mysql serveren
 exports.SetupMySql = function(mysql, callback) {
   var con = mysql.createConnection({
     host: "localhost",
@@ -32,16 +35,29 @@ exports.SetupMySql = function(mysql, callback) {
     password: "klat9"
   });
 
-
-  con.connect(function(err) {
-    if (err) {
+  // Prøver at connecte
+  con.connect(function(err)
+  {
+    if (err)
+    {
+      // Hvis der er en fejl skal den udskrive den
       console.log("Couldnt connect: " + err);
-    } else {
+    }
+    else
+    {
       console.log("Conntected To MySql Server!");
-      con.query("CREATE DATABASE IF NOT EXISTS quickmafs;", function(err, result) {
-        if (err) {
+
+      // Skabber databasen
+      con.query("CREATE DATABASE IF NOT EXISTS quickmafs;", function(err, result)
+      {
+        if (err)
+        {
+          // Hvis fejl skriv den ud
           console.log("Error: " + err);
-        } else {
+        }
+        else
+        {
+          // Hvis succes lav et callback
           console.log("Database quickmafs created");
           callback();
         }
@@ -51,7 +67,9 @@ exports.SetupMySql = function(mysql, callback) {
 }
 
 exports.CreateNewCon = function(mysql) {
-  var con = mysql.createConnection({
+  // Connecter til databasen
+  var con = mysql.createConnection(
+    {
     host: "localhost",
     user: "root",
     password: "klat9",
@@ -63,20 +81,34 @@ exports.CreateNewCon = function(mysql) {
 
 exports.CreateUserTable = function(con) {
   var sqlQuery = "CREATE TABLE IF NOT EXISTS users (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, username varchar(64) unique, password varchar(255), display_name varchar(64), skill_level int(10), Elo int(255), Email varchar(255) unique);";
-  con.query(sqlQuery, function(err, result) {
-    if (err) {
+
+  // Laver query til at lave user table
+  con.query(sqlQuery, function(err, result)
+  {
+    if (err)
+    {
+      // Hvis fejl udskriv den
       console.log("Error: " + err);
-    } else {
+    }
+    else
+    {
       console.log("Table users created");
     }
   });
 }
 
 exports.CreateMatchesTable = function(con) {
-  con.query("CREATE TABLE IF NOT EXISTS matches (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, player_one INT(255), player_two INT(255), player_one_wins INT(10), player_two_wins INT(10), elo_differense INT(255));", function(err, result) {
-    if (err) {
+
+  // Laver query til at lave matches table
+  con.query("CREATE TABLE IF NOT EXISTS matches (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, player_one INT(255), player_two INT(255), player_one_wins INT(10), player_two_wins INT(10), elo_differense INT(255));", function(err, result)
+  {
+    if (err)
+    {
+      // udskriver fejl hvis der er nogen
       console.log("Error: " + err);
-    } else {
+    }
+    else
+    {
       console.log("Table matches created");
     }
   });
@@ -84,6 +116,7 @@ exports.CreateMatchesTable = function(con) {
 
 function DeleteDB(con, callback)
 {
+  // Sletter databasen
   con.query("drop database IF EXISTS quickmafs;", function (err, result)
   {
     if (err)
