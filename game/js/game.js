@@ -234,9 +234,12 @@ function onGameFound(data) {
 		tScene.endGame = true;
 	});
 	//change scene to Game
+	var promise = new Promise((resolve, reject) => {
+		mgr.showScene(GameScene, {game: currentGame, resolve: resolve});
+	}).then(() => socket.emit("startedGame"));
 
-	mgr.showScene(GameScene, currentGame);
-	socket.emit("startedGame");
+	
+	
 
 
 }
@@ -276,7 +279,7 @@ function GameScene() {
 
 		//set game object
 
-		this.game = this.sceneArgs;
+		this.game = this.sceneArgs.game;
 		this.winner = null;
 		this.tick = 0;
 		this.endGameTick = 0;
@@ -321,6 +324,10 @@ function GameScene() {
 
 			this.questionRegions.push(r);
 			this._mouseHandler.addRegion(r);
+		}
+
+		if (typeof this.sceneArgs.resolve == "function") {
+			this.sceneArgs.resolve();
 		}
 
 	}
@@ -453,14 +460,21 @@ GameScene.prototype.mousePress = function () {
 
 
 
-function MathGame(player0, player1, questionLength, callback){
-	this.player0 = new MathGamePlayer(player0);
-	this.player1 = new MathGamePlayer(player1);
+
+
+function addMinutes(date, minutes) {
+    return new Date(date.getTime() + minutes*60000);
+}
+
+
+function MathGame(player0i, player1i, questionLength, callback){
+	this.player0 = new MathGamePlayer(player0i);
+	this.player1 = new MathGamePlayer(player1i);
 	this.players = [this.player0, this.player1];
 	this.questionLength = questionLength;
 	this.callback = callback;
-	
 
+	
 }
 
 MathGame.prototype.setPlayerName = function(playerInt, name) {
@@ -468,15 +482,72 @@ MathGame.prototype.setPlayerName = function(playerInt, name) {
 
 };
 
-MathGame.prototype.addProgress = function (playerInt) {
-	this.players[playerInt].addProgress();
-	if (this.players[playerInt].progress == this.questionLength) {
-		//this player has won!
-		//end the game by telling who won the game
-		if (typeof this.callback == "function") {
-			this.callback();
-		}	
+MathGame.prototype.addProgress = function (playerInt, correct) {
+	var thisPlayer = this.players[playerInt];
+	thisPlayer.addProgress(correct);
+	if (thisPlayer.progress == this.questionLength) {
+		thisPlayer.finished = true;
+		thisPlayer.timeFinished = new Date();
+		if (thisPlayer.progress == thisPlayer.right) {
+			//this player has won!
+			//end the game by telling who won the game
+			this.endGame();
+		}
+		if (this.isAllPlayersFinished()) {
+			this.endGame();
+		}			
+	}
+}
 
+MathGame.prototype.isAllPlayersFinished = function() {
+	for (var i = this.players.length - 1; i >= 0; i--) {
+		if ( !this.players[i].finished ) {
+			return false
+		}
+	}
+	return true;
+}
+
+MathGame.prototype.findWinner = function () {
+	//find player with most rights
+	var mostRights = [];
+	var mostRightAmount = 0;
+	for (var i = this.players.length - 1; i >= 0; i--) {
+		if (this.players[i].right == mostRightAmount) {
+			mostRights.push(this.players[i]);
+		}else if (this.players[i].right > mostRightAmount) {
+			mostRights = [this.players[i]];
+			mostRightAmount = this.players[i].right;
+		}
+	}
+
+	//if there is only one player with most rights, then that will be the winner
+	if (mostRights.length == 1) {
+		return mostRights[0];
+	}
+
+	//find the player who ended the game first
+	var firstFinished;
+	var placeholderTime = new Date();
+	addMinutes(placeholderTime, 10);
+	var firstFinishedTime = placeholderTime;
+
+	for (var i = mostRights.length - 1; i >= 0; i--) {
+		var playerTime = mostRights[i].timeFinished.getTime(); 
+		if (playerTime < firstFinishedTime) {
+			firstFinished = mostRights[i]
+			firstFinishedTime = playerTime;
+		}
+	}
+
+	return firstFinished;
+
+
+}
+
+MathGame.prototype.endGame = function() {
+	if (typeof this.callback == "function") {
+		this.callback(this.findWinner());
 	}
 }
 
@@ -485,11 +556,35 @@ function MathGamePlayer(name) {
 	//constructor
 	this.name = name;
 	this.progress = 0;
+	this.wrong = 0;
+	this.right = 0;
+	this.finished = false;
+	this.timeFinished = addMinutes(new Date(), 20);
+	
+
 }
 
-MathGamePlayer.prototype.addProgress = function() {
+
+
+MathGamePlayer.prototype.addProgress = function(correct) {
+	if (correct) {
+		this.right++;
+	} else {
+		this.wrong++;
+	}
 	this.progress++;
 };
+
+if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
+	module.exports.MathGame = MathGame; 
+} else {
+	window.MathGame = MathGame;
+	window.MathGamePlayer = MathGamePlayer;
+}
+
+
+
+
 
 
 function onGameData(data) {
@@ -522,7 +617,7 @@ function onAddprogress(data) {
 	 	return;
 	 }
 
-	mgr.scene.oScene.game.addProgress(d1.playerInt);
+	mgr.scene.oScene.game.addProgress(d1.playerInt, d1.correct);
 }
 
 
@@ -566,7 +661,10 @@ function answerQuestion(answer, qId){
 	mgr.scene.oScene.questionHolder.setUserAnswer(answer, qId);
 
 	//emit to the server what the user answered
-	socket.emit("answerQuestion", answer);
+	socket.emit("gameAction", {
+		action: "answer",
+		value: answer
+	});
 }
 
 
@@ -722,4 +820,6 @@ MouseHandler.prototype.onClick = function(x,y) {
 /*
 TODO:
 tegn hegn
+flere input felter
+vis forskellige progress for wrong og right
 */
