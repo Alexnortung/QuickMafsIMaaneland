@@ -102,17 +102,22 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
             this.preStartMathGame(players, preparedGame, gameId, privateGame, () =>{
                 resolve();
             });
+        } else {
+          reject();
         }
     });
 
     promise.then(() => {
         preparedGame.gameType = gameType;
         preparedGame.players = players;
+        preparedGame.gameId = gameId;
         this.games[gameId] = preparedGame; /*this.io.to("game" + this.currentGame).emit("start", "game started");*/
         //console.log("gameid: " + gameId);
         this.io.to("game" + gameId).emit('gameFound', preparedGame.preparedRes);
 
         this.currentGame++;
+    }).catch((rejectValue) => {
+      //console.log(rejectValue);
     });
     
     
@@ -143,16 +148,50 @@ Init.prototype.tttHandler = function(data, socket) {
 
 
 Init.prototype.mathGameHandler = function(data, socket) {
+    var thisInstance = this;
     if (data.action == "answer") {
         var cGame = thisInstance.games[thisInstance.users[socket.id].gameID];
-        var cPlayer;
-        for (var i = cGame.players.length - 1; i >= 0; i--) {
-            if(cGame.players[i].id == socket.id){
-                cPlayer = cGame.players[i]
+        var playerInt;
+        for (var i = cGame.game.players.length - 1; i >= 0; i--) {
+            if(cGame.game.players[i].name.id == socket.id){
+                playerInt = i;
             }
         }
-        var question = cGame.game.questionResults[1][cPlayer.progress];
+        var cPlayer = cGame.game.players[playerInt];
+        var question = cGame.questionResults[1][cPlayer.progress];
+        //console.log(cPlayer.id, cGame);
+        var correct = question.answer == data.value;
+        cGame.game.addProgress(playerInt , correct);
+
+        //send det rigtige svar til clienten
+        socket.emit("answer", {
+            answer: question.answer,
+            qId: question.id
+        });
+
+        //tilføj hus for begge spilleres client
+        this.io.to("game" + cGame.gameId).emit("progress", {
+            correct: correct,
+            playerInt: playerInt
+        });
+
+        //send det næste spørgsmål til clienten
+
+        var questionsLength = cGame.questionResults[1].length;
+        if (cPlayer.progress < questionsLength) {
+            var question = currentGame.questionResults[1][cPlayer.progress];
+            socket.emit("question", {
+                img: question.imgPath,
+                qId: question.id
+            });
+        }
         
+
+        console.log("emitted", {
+            correct: correct,
+            playerInt: playerInt
+        });
+
     }
 };
 
@@ -346,6 +385,7 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privat
     //get question
     promise.then((results) => {
 
+        console.log(results);
         preparedGame.questionResults = results;
 
         var questionLength = results[1].length;
@@ -362,6 +402,8 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privat
 
         });
         callback();
+    }).catch((rejectValue) => {
+      console.log(rejectValue);
     });
     
      

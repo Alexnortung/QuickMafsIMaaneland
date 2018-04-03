@@ -28,10 +28,7 @@ sqlS.SetupMySqldev(mysql, function()
         console.log('listening on: 3000');
         });
         var init = new queue.Init(io, con);
-        sqlS.FindQuestion(con, function(results) {
-            console.log(results[1].length);
-            
-        });
+        
       });
     });
   });
