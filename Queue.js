@@ -1,5 +1,5 @@
 //var ttt = require("./Krydsogbolle/Game.js");
-var MathGame = require("./MathGame/MathGame.js").MathGame;
+var MathGame = require("./game/js/MathGame.js").MathGame;
 var sqlS = require('./sqlSetup.js');
 
 var gamesTypes = ["1v1", "ttt"];
@@ -179,7 +179,7 @@ Init.prototype.mathGameHandler = function(data, socket) {
 
         var questionsLength = cGame.questionResults[1].length;
         if (cPlayer.progress < questionsLength) {
-            var question = currentGame.questionResults[1][cPlayer.progress];
+            var question = cGame.questionResults[1][cPlayer.progress];
             socket.emit("question", {
                 img: question.imgPath,
                 qId: question.id
@@ -187,10 +187,10 @@ Init.prototype.mathGameHandler = function(data, socket) {
         }
         
 
-        console.log("emitted", {
+        /*console.log("emitted", {
             correct: correct,
             playerInt: playerInt
-        });
+        });*/
 
     }
 };
@@ -374,7 +374,7 @@ function Init(io, dbCon) {
     });
 }
 
-Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privateGame, callback) {
+Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privateGame, callback) {
     var thisInstance = this;
     var promise = new Promise((resolve, reject) => {
         sqlS.FindQuestion(this.dbCon, function(results) {
@@ -398,9 +398,12 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameid, privat
         preparedGame.preparedRes = preRes;
         preparedGame.game = new MathGame(players[0], players[1], questionLength, function(winner) {
             // callback
-            this.endGame(winner, gameId);
+            console.log("running callback for MathGame instance, gameId: " + gameId);
+            thisInstance.endGame(winner, gameId);
 
         });
+
+
         callback();
     }).catch((rejectValue) => {
       console.log(rejectValue);

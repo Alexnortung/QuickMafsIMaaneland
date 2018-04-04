@@ -49,10 +49,13 @@ MathGame.prototype.findWinner = function () {
 	//find player with most rights
 	var mostRights = [];
 	var mostRightAmount = 0;
+	console.log("finding winner");
 	for (var i = this.players.length - 1; i >= 0; i--) {
 		if (this.players[i].right == mostRightAmount) {
+			console.log("pushed player to mostRights");
 			mostRights.push(this.players[i]);
 		}else if (this.players[i].right > mostRightAmount) {
+			console.log("replaced the mostRights Array");
 			mostRights = [this.players[i]];
 			mostRightAmount = this.players[i].right;
 		}
@@ -60,6 +63,8 @@ MathGame.prototype.findWinner = function () {
 
 	//if there is only one player with most rights, then that will be the winner
 	if (mostRights.length == 1) {
+		console.log("there was only 1 with mostRights", mostRights[0]);
+
 		return mostRights[0];
 	}
 
@@ -84,9 +89,20 @@ MathGame.prototype.findWinner = function () {
 
 MathGame.prototype.endGame = function() {
 	if (typeof this.callback == "function") {
-		this.callback(this.findWinner());
+		var winner = this.findWinner();
+		var winnerInt = this.getPlayerInt(winner);
+		this.callback(winnerInt);
 	}
 }
+
+
+MathGame.prototype.getPlayerInt = function(player) {
+	for (var i = this.players.length - 1; i >= 0; i--) {
+		if (this.players[i] === player) {
+			return i;
+		} 
+	}
+};
 
 
 function MathGamePlayer(name) {
