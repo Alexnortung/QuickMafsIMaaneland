@@ -1,3 +1,7 @@
+/*******************************
+***Henter forskellige moduler***
+*******************************/
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -11,24 +15,35 @@ var question = require('./questions.js');
 
 app.use("/", express.static(__dirname + "/game"));
 
+//Indsætter database
 var con;
+// Sætter forbindelse til mysql server op
 sqlS.SetupMySqldev(mysql, function()
 {
+  // Laver en connection til databasen
   con = sqlS.CreateNewCon(mysql)
+
+  // Laver table user
   sqlS.CreateUserTable(con);
+
+  // Laver table matches
   sqlS.CreateMatchesTable(con);
+
+  // Laver spørgsmål og under spørgsmål
   sqlS.CreateQuestions(con, function()
   {
     sqlS.CreateSubQuestions(con, function()
     {
       sqlS.CreateQuestionAndSubQuestions(con, function ()
       {
+        // Sætter serveren til at lytte efter brugere
         http.listen(3000, function()
         {
-        console.log('listening on: 3000');
+          console.log('listening on: 3000');
         });
+
+        // Laver et nyt object af queue
         var init = new queue.Init(io, con);
-        
       });
     });
   });
@@ -40,9 +55,10 @@ var connections = [];
 
 
 
-
+// Checker for connections
 io.on('connection', function(socket)
 {
+  // Sætter socket ind i array
   connections.push(socket);
   console.log("There are %s connections", connections.length);
 
@@ -70,8 +86,10 @@ io.on('connection', function(socket)
     });
   });*/
 
+  // Lytter efter folk der disconnecter
   socket.on('disconnect', function()
   {
+    // Fjerner dem fra array når de disconnecter
     connections.splice(connections.indexOf(socket), 1);
     console.log("There are %s connections", connections.length);
   });
