@@ -2,6 +2,7 @@
 ***Henter forskellige moduler***
 *******************************/
 
+require("dotenv").config();
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -37,7 +38,7 @@ sqlS.SetupMySql(mysql, function()
       sqlS.CreateQuestionAndSubQuestions(con, function ()
       {
         // Sætter serveren til at lytte efter brugere
-        http.listen(3000, function()
+        http.listen(process.env.HTTP_PORT, function()
         {
           console.log('listening on: 3000');
         });
