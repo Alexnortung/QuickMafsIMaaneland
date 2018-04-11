@@ -596,6 +596,7 @@ QuestionHolder.prototype.addQuestion = function(question) {
 QuestionHolder.prototype.showQuestion = function(questionNumber) {
 	this.showingQuestion = questionNumber;
 
+
 	return this;
 };
 
@@ -624,9 +625,15 @@ QuestionHolder.prototype.setUserAnswer = function(answer, id) {
 
 
 
-function Question(imgPath, qId) {
+function Question(imgPath, qId, answers) {
 	//constructor
 	this.id = qId;
+	if (typeof answers == "undefined") {
+		this.answers = 1;
+	} else {
+		this.answers = answers
+	}
+	
 	var thisInsatnce = this;
 	
 	GetResizedImage(750, 750, imgPath, (sizeObj) => {
@@ -648,6 +655,13 @@ Question.prototype.setAnswer = function(answer) {
 };
 
 
+
+
+
+function createInput(canvas, x,y) {
+	
+
+}
 
 
 
@@ -742,11 +756,9 @@ MouseHandler.prototype.onClick = function(x,y) {
 /*
 TODO:
 hvor mange er ingame
-hvor mange er online 
 hvor mange er i queue
 
 
-send loaded ( send nudes )
 tegn hegn
 flere input felter
 vis forskellige progress for wrong og right

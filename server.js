@@ -18,7 +18,7 @@ app.use("/", express.static(__dirname + "/game"));
 //Indsætter database
 var con;
 // Sætter forbindelse til mysql server op
-sqlS.SetupMySqldev(mysql, function()
+sqlS.SetupMySql(mysql, function()
 {
   // Laver en connection til databasen
   con = sqlS.CreateNewCon(mysql)

@@ -1,10 +1,12 @@
+require("dotenv").config();
+
 // Function KUN BRUGT UNDER DEVELOPMENT Sletter alle databaser
 exports.SetupMySqldev = function(mysql, callback) {
   // Laver en connection
   var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "klat9"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS
   });
 
   //Sletter det hele
@@ -29,11 +31,14 @@ exports.SetupMySqldev = function(mysql, callback) {
 
 // FUNCTION laver en connection til mysql serveren
 exports.SetupMySql = function(mysql, callback) {
-  var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "klat9"
-  });
+  var opts = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS
+  }
+  //console.log(process.env);
+  //console.log(opts);
+  var con = mysql.createConnection(opts);
 
   // Prøver at connecte
   con.connect(function(err)
