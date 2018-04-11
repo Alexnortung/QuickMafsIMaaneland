@@ -50,7 +50,7 @@ sqlS.SetupMySql(mysql, function()
 
 http.listen(process.env.HTTP_PORT, function()
 {
-  console.log('listening on: 3000');
+  console.log('listening on: ' + process.env.HTTP_PORT);
 });
 
 var init = new queue.Init(io);
