@@ -6,6 +6,7 @@ var currentGame;
 var findingGame = false;
 var ingame = false;
 var canvasSize;
+var playersOnlineNumber = 1;
 
 $(function ()
 {
@@ -19,6 +20,7 @@ $(function ()
 	socket.on("progress", onAddprogress);
 	socket.on("question", onQuestionRecieved);
 	socket.on("answer", onAnswerRecieved);
+	socket.on("playerOnline", onPlayersOnline)
 
 
 });
@@ -73,6 +75,7 @@ function MainMenu() {
 		//create click regions
 		this.findMatchRegion = new Region(getSize(0.7, 0), getSize(0.75, 1), getSize(0.2, 0), getSize(0.175, 1));
 		this.findMatchRegion.onclick = function () {
+			
 			findGame();
 		}
 		this.cancelMatchRegion = new Region(getSize(0.7, 0), getSize(0.75, 1), getSize(0.2, 0), getSize(0.175, 1));
@@ -114,17 +117,32 @@ function MainMenu() {
 		}
 
 		pop();
-		//text
+		
+
+		//draw how many players are online
+		push();
+		fill(255);
+		textAlign(LEFT, TOP);
+		textSize(getSize(24/1920, 0));
+		text("players online: " + playersOnlineNumber, getSize(0.015, 0), getSize(0.01, 1));
+		pop();
+
 
 	}
 }
 
 MainMenu.prototype.mousePress = function () {
+	
 	this._mouseHandler.onClick(mouseX, mouseY);
 }
 
 
 
+
+function onPlayersOnline(data) {
+	playersOnlineNumber = data;
+	//console.log(data);
+}
 
 
 
@@ -169,7 +187,9 @@ function onCancelMatchResponse(data) {
 function findGame() {
 	//console.log("sending request for finding a game");
 	//sends a request to find a game
+	
 	socket.emit("findMathGame");
+	
 }
 
 function onFindMatchResponse(data) {
@@ -372,7 +392,14 @@ function GameScene() {
 			if (typeof thisQuestion != "undefined") {
 				push();
 				imageMode(CENTER);
-				image(thisQuestion.img, getSize(0.5, 0), getSize(0.45, 1), getSize(750/1920,0), getSize(750/1920,0));
+
+				//console.log(thisQuestion);
+
+				if (typeof thisQuestion !== "undefined" && typeof thisQuestion.imgSize !== "undefined") {
+					image(thisQuestion.img, getSize(0.5, 0), getSize(0.45, 1), getSize(thisQuestion.imgSize.width/1920,0), getSize(thisQuestion.imgSize.height/1920,0));
+				}
+
+				
 				pop();
 			}
 
@@ -568,6 +595,7 @@ QuestionHolder.prototype.addQuestion = function(question) {
 
 QuestionHolder.prototype.showQuestion = function(questionNumber) {
 	this.showingQuestion = questionNumber;
+
 	return this;
 };
 
@@ -596,10 +624,15 @@ QuestionHolder.prototype.setUserAnswer = function(answer, id) {
 
 
 
-function Question(img, qId) {
+function Question(imgPath, qId) {
 	//constructor
 	this.id = qId;
-	this.img = loadImage(img);
+	var thisInsatnce = this;
+	
+	GetResizedImage(750, 750, imgPath, (sizeObj) => {
+		thisInsatnce.imgSize = sizeObj;
+	});
+	this.img = loadImage(imgPath);
 	this.answer = null;
 	this.userAnswer = null;
 	this.isAnswered = false;
@@ -686,11 +719,15 @@ MouseHandler.prototype.removeRegion = function(id) {
 };
 
 MouseHandler.prototype.onClick = function(x,y) {
+	
 	//check all regions if the click was inside one of them
 	//console.log("user clicked at x: " + x + " y: " + y);
 	for (var i = this.regions.length - 1; i >= 0; i--) {
+		
 		if (typeof this.regions[i].onclick == "function") {
+			
 			if (this.regions[i].isInside()) {
+				
 				//console.log("user clicked inside region: " + i);
 				this.regions[i].onclick();
 			}
@@ -704,8 +741,14 @@ MouseHandler.prototype.onClick = function(x,y) {
 
 /*
 TODO:
+hvor mange er ingame
+hvor mange er online 
+hvor mange er i queue
+
+
 send loaded ( send nudes )
 tegn hegn
 flere input felter
 vis forskellige progress for wrong og right
+reset main menu
 */

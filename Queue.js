@@ -28,6 +28,7 @@ function checkData(data) {
 }
 
 Init.prototype.findGame = function(socket, gameType) {
+    
     var foundGame = false;
     var gameID;
     var queueNumber;
@@ -49,6 +50,8 @@ Init.prototype.findGame = function(socket, gameType) {
         //console.log(socket.id + " will now be queued");
     }
 
+    
+
     if (typeof this.queue[0] !== "undefined") {
         for (i = 0; i < this.queue.length; i++) {
             if (this.queue[i].gameType == gameType) {
@@ -58,6 +61,8 @@ Init.prototype.findGame = function(socket, gameType) {
             }
         }
     }
+
+    
 
     /* If game not found: put player in queue*/
 
@@ -75,6 +80,7 @@ Init.prototype.findGame = function(socket, gameType) {
         this.queue.splice(queueNumber, 1);
         this.startGame([socket, queueDetails.socket], gameType);
     }
+    
 };
 
 Init.prototype.startGame = function(players, gameType, privateGame, gameId)
@@ -114,6 +120,17 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
         this.games[gameId] = preparedGame; /*this.io.to("game" + this.currentGame).emit("start", "game started");*/
         //console.log("gameid: " + gameId);
         this.io.to("game" + gameId).emit('gameFound', preparedGame.preparedRes);
+        //if all players loaded
+        var cGame = this.games[gameId];
+        if (cGame.allLoaded === true) {
+            this.io.to("game" + gameId).emit('question', {
+                img: question.imgPath,
+                qId: question.id
+            });
+        }
+        
+
+
 
         this.currentGame++;
     }).catch((rejectValue) => {
@@ -195,16 +212,25 @@ Init.prototype.mathGameHandler = function(data, socket) {
     }
 };
 
+Init.prototype.getPlayersOnlineNumber = function() {
+    return Object.keys(this.users).length;
+};
+
 
 Init.prototype.socketHandler = function(socket) {
     this.users[socket.id] = {};
     this.users[socket.id].inqueue = false;
     this.users[socket.id].ingame = false;
+    this.users[socket.id].loadedGame = false;
     this.users[socket.id].gameID = null;
     this.users[socket.id].gameType = null;
     this.users[socket.id].nickname = "";
     this.users[socket.id].gameData = {};
     var thisInstance = this;
+
+    this.io.sockets.emit("playerOnline", thisInstance.getPlayersOnlineNumber());
+
+
     socket.on("action", function(data) {
       socket.broadcast.emit("action", data);
       socket.emit("action", data);
@@ -240,17 +266,51 @@ Init.prototype.socketHandler = function(socket) {
     socket.on("findMathGame", function(data)
     {
 
+
       thisInstance.findGame(socket, "1v1");
     });
 
     socket.on("startedGame", function(data) {
-        //send question
-        var question = thisInstance.games[thisInstance.users[socket.id].gameID]
-        .questionResults[1][0];
-        socket.emit("question", {
+        //console.log("player loaded game");
+
+        //if all players in the game has loaded: send the question
+        //and the question has been found
+        var gameId = thisInstance.users[socket.id].gameID;
+        var cGame = thisInstance.games[gameId];
+
+
+        socket.loadedGame = true;
+        thisInstance.users[socket.id].loadedGame = true;
+
+
+        //check if all players loaded
+        for (var i = cGame.players.length - 1; i >= 0; i--) {
+            if (!cGame.players[i].loadedGame) {
+                //all players have not loaded
+                //console.log(cGame.players[i].id);
+                return;
+            } 
+        }
+
+        console.log("both players have loaded");
+
+        var question = thisInstance.games[thisInstance.users[socket.id].gameID].questionResults[1][0];
+        if (typeof question == "undefined") {
+            //question has not loaded
+            return;
+        }
+
+        cGame.allLoaded = true;
+
+        thisInstance.io.to("game" + gameId).emit('question', {
             img: question.imgPath,
             qId: question.id
         });
+
+        
+    
+
+        
     });
 
 
@@ -355,6 +415,7 @@ Init.prototype.socketHandler = function(socket) {
           }
       }
       delete thisInstance.users[socket.id];
+      thisInstance.io.sockets.emit("playerOnline", thisInstance.getPlayersOnlineNumber());
     });
     
 }
@@ -398,7 +459,7 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privat
         preparedGame.preparedRes = preRes;
         preparedGame.game = new MathGame(players[0], players[1], questionLength, function(winner) {
             // callback
-            console.log("running callback for MathGame instance, gameId: " + gameId);
+            //console.log("running callback for MathGame instance, gameId: " + gameId);
             thisInstance.endGame(winner, gameId);
 
         });

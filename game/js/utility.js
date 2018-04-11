@@ -1,5 +1,5 @@
 // path til hvor spørgsmåls billeder er
-const questionPath = "../img/questions/";
+const questionPath = "";
 
 
 // Function finder originale billede størrelser udfra billede navn (med extension)
@@ -19,7 +19,7 @@ function GetPictureSize(imgname, callback)
 // Function tager imod billede dimensioner, og kan scalere det til max width eller height uden det bliver distortet
 function ResizeImage(width, height, maxwidth, maxheight)
 {
-  if (width > height)
+  if (width >= height)
   {
     // Finder hvor mange procent større width er
     var scale = maxwidth / width;
@@ -46,15 +46,15 @@ function ResizeImage(width, height, maxwidth, maxheight)
 }
 
 // Function Sender tilbage dimensioner på billedet der er skaleret, den henter også billede
-function GetResizedImage(maxwidth, maxheight, imgPath)
+function GetResizedImage(maxwidth, maxheight, imgPath, callback)
 {
   // Finder billede og originale dimensioner
   GetPictureSize(imgPath, function(width, height)
   {
     //Finder nye dimensioner når den har fundet originale
     var newSize = ResizeImage(width, height, maxwidth, maxheight);
-
+    console.log(newSize);
     //Sender tilbage nye skaleret dimensioner
-    return newSize;
+    callback(newSize);
   });
 }
