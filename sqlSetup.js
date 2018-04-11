@@ -7,7 +7,6 @@ exports.SetupMySqldev = function(mysql, callback) {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS
-
   });
 
   //Sletter det hele
@@ -32,7 +31,7 @@ exports.SetupMySqldev = function(mysql, callback) {
 
 // FUNCTION laver en connection til mysql serveren
 exports.SetupMySql = function(mysql, callback) {
-  var con = {
+  var opts = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
@@ -40,6 +39,7 @@ exports.SetupMySql = function(mysql, callback) {
   }
   //console.log(process.env);
   //console.log(opts);
+  var con = mysql.createConnection(opts);
 
   // Prøver at connecte
   con.connect(function(err)
@@ -51,23 +51,7 @@ exports.SetupMySql = function(mysql, callback) {
     }
     else
     {
-      console.log("Conntected To MySql Server!");
-
-      // Skabber databasen
-      con.query("CREATE DATABASE IF NOT EXISTS quickmafs;", function(err, result)
-      {
-        if (err)
-        {
-          // Hvis fejl skriv den ud
-          console.log("Error: " + err);
-        }
-        else
-        {
-          // Hvis succes lav et callback
-          console.log("Database quickmafs created");
-          callback();
-        }
-      });
+      callback();
     }
   });
 }
