@@ -421,9 +421,9 @@ Init.prototype.socketHandler = function(socket) {
 }
 
 
-function Init(io, dbCon) {
+function Init(io) {
     this.io = io;
-    this.dbCon = dbCon;
+    
     this.queue = [];
     this.games = {};
     this.users = {};
@@ -438,7 +438,7 @@ function Init(io, dbCon) {
 Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privateGame, callback) {
     var thisInstance = this;
     var promise = new Promise((resolve, reject) => {
-        sqlS.FindQuestion(this.dbCon, function(results) {
+        sqlS.FindQuestion(function(results) {
             //console.log(results);
             resolve(results);
         });
