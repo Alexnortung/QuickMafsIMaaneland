@@ -7,6 +7,7 @@ exports.SetupMySqldev = function(mysql, callback) {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS
+
   });
 
   //Sletter det hele
@@ -31,14 +32,14 @@ exports.SetupMySqldev = function(mysql, callback) {
 
 // FUNCTION laver en connection til mysql serveren
 exports.SetupMySql = function(mysql, callback) {
-  var opts = {
+  var con = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
-    password: process.env.DB_PASS
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
   }
   //console.log(process.env);
   //console.log(opts);
-  var con = mysql.createConnection(opts);
 
   // Prøver at connecte
   con.connect(function(err)
