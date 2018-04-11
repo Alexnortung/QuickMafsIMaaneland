@@ -60,10 +60,10 @@ exports.CreateNewCon = function(mysql) {
   // Connecter til databasen
   var con = mysql.createConnection(
     {
-    host: "localhost",
-    user: "root",
-    password: "klat9",
-    database: "quickmafs"
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME
   });
 
   return con;
