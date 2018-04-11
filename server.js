@@ -7,7 +7,6 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var port = process.env.PORT || 3000;
-var mysql = require('mysql');
 var io = require('socket.io')(http, { wsEngine: 'ws' });
 var sqlS = require('./sqlSetup.js');
 var crypt = require('./passwordCrypt.js');
@@ -17,8 +16,10 @@ var question = require('./questions.js');
 app.use("/", express.static(__dirname + "/game"));
 
 //Indsætter database
+/*
 var con;
 // Sætter forbindelse til mysql server op
+
 sqlS.SetupMySql(mysql, function()
 {
   // Laver en connection til databasen
@@ -48,9 +49,9 @@ sqlS.SetupMySql(mysql, function()
       });
     });
   });
-});
+});*/
 
-
+var init = new queue.Init(io);
 var connections = [];
 
 
