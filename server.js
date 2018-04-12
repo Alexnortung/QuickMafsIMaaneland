@@ -39,10 +39,7 @@ sqlS.SetupMySql(mysql, function()
       sqlS.CreateQuestionAndSubQuestions(con, function ()
       {
         // Sætter serveren til at lytte efter brugere
-        http.listen(process.env.HTTP_PORT, function()
-        {
-          console.log('listening on: 3000');
-        });
+
 
         // Laver et nyt object af queue
         var init = new queue.Init(io, con);
@@ -50,6 +47,11 @@ sqlS.SetupMySql(mysql, function()
     });
   });
 });*/
+
+http.listen(process.env.HTTP_PORT, function()
+{
+  console.log('listening on: ' + process.env.HTTP_PORT);
+});
 
 var init = new queue.Init(io);
 var connections = [];

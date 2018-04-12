@@ -177,18 +177,18 @@ exports.CreateQuestionAndSubQuestions = function(con, callback) {
 
 exports.FindQuestion = function(callback)
 {
-  var con = createConnection(mysql);
-
-
-  var QuestionPlusSub = [];
-  con.query("SELECT id, category, title FROM questions", function(err, result) {
-    var questionid = result[Math.floor(Math.random() * result.length)].id;
-    QuestionPlusSub.push(result[questionid - 1]);
-    con.query("SELECT * FROM subQuestions WHERE questionId = " + questionid, function(err, subResult) {
-      QuestionPlusSub.push(subResult);
-      var results = QuestionPlusSub;
-      con.end();
-      callback(results);
+  var con = createConnection(mysql, function ()
+  {
+    var QuestionPlusSub = [];
+    con.query("SELECT id, category, title FROM questions", function(err, result) {
+      var questionid = result[Math.floor(Math.random() * result.length)].id;
+      QuestionPlusSub.push(result[questionid - 1]);
+      con.query("SELECT * FROM subQuestions WHERE questionId = " + questionid, function(err, subResult) {
+        QuestionPlusSub.push(subResult);
+        var results = QuestionPlusSub;
+        con.end();
+        callback(results);
+      });
     });
   });
 }
