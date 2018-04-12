@@ -447,7 +447,7 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privat
     var thisInstance = this;
     var promise = new Promise((resolve, reject) => {
         sqlS.FindQuestion(function(results) {
-            console.log(results);
+            //console.log(results);
             resolve(results);
         });
     });
