@@ -177,7 +177,7 @@ exports.CreateQuestionAndSubQuestions = function(con, callback) {
 
 exports.FindQuestion = function(callback)
 {
-  var con = createConnection(mysql, function ()
+  var con = CreateNewCon(mysql, function ()
   {
     var QuestionPlusSub = [];
     con.query("SELECT id, category, title FROM questions", function(err, result) {
