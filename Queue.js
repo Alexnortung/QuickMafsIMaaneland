@@ -408,7 +408,7 @@ Init.prototype.socketHandler = function(socket) {
           }
       }
       if (thisInstance.users[socket.id].ingame) {
-        console.log();
+        //console.log();
         var cGame = thisInstance.games[thisInstance.users[socket.id].gameID];
         if (typeof cGame !== "undefined") {
           if (cGame.gameType == gamesTypes[1]) {
@@ -489,13 +489,17 @@ Init.prototype.endGame = function(winner, gameId) {
     var preparedEmitEnd = {};
     preparedEmitEnd.winner = winner;
     thisInstance.io.to("game" + gameId).emit("endGame", preparedEmitEnd);
-    for (i = 0; i < thisInstance.games[gameId].players.length; i++) {
-        var thisPlayerId = thisInstance.games[gameId].players[i].id;
+    var cGame = thisInstance.games[gameId];
+    if (typeof cGame == "undefined") {
+      return;
+    }
+    for (i = 0; i < cGame.players.length; i++) {
+        var thisPlayerId = cGame.players[i].id;
         thisInstance.users[thisPlayerId].ingame = false;
         thisInstance.users[thisPlayerId].gameID = null;
         thisInstance.users[thisPlayerId].gameData = {};
     }
-    delete thisInstance.games[gameId];
+    delete cGame;
 
 };
 
