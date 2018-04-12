@@ -407,12 +407,14 @@ Init.prototype.socketHandler = function(socket) {
               }
           }
       }
-      if (thisInstance.users[socket.id].ingame && thisInstance.games[thisInstance.users[socket.id].gameID].gameType == gamesTypes[1]) {
+      if (thisInstance.users[socket.id].ingame) {
+        if (thisInstance.games[thisInstance.users[socket.id].gameID].gameType == gamesTypes[1]) {
           if (thisInstance.users[socket.id].gameData.token == "circle") {
               thisInstance.games[thisInstance.users[socket.id].gameID].game.end("cross");
           } else {
               thisInstance.games[thisInstance.users[socket.id].gameID].game.end("circle");
           }
+        }
       }
       delete thisInstance.users[socket.id];
       thisInstance.io.sockets.emit("playerOnline", thisInstance.getPlayersOnlineNumber());
