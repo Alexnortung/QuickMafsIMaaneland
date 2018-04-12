@@ -57,7 +57,7 @@ exports.SetupMySql = function(mysql, callback) {
   });
 }
 
-exports.CreateNewCon = function(mysql) {
+function CreateNewCon(callback) {
   // Connecter til databasen
   var con = mysql.createConnection(
     {
@@ -67,7 +67,7 @@ exports.CreateNewCon = function(mysql) {
       database: process.env.DB_NAME
   });
 
-  return con;
+  callback( con);
 }
 
 exports.CreateUserTable = function(con) {
@@ -177,17 +177,20 @@ exports.CreateQuestionAndSubQuestions = function(con, callback) {
 
 exports.FindQuestion = function(callback)
 {
-  var con = CreateNewCon(mysql, function ()
+  CreateNewCon(function (con)
   {
     var QuestionPlusSub = [];
     con.query("SELECT id, category, title FROM questions", function(err, result) {
+      console.log(err);
       var questionid = result[Math.floor(Math.random() * result.length)].id;
       QuestionPlusSub.push(result[questionid - 1]);
       con.query("SELECT * FROM subQuestions WHERE questionId = " + questionid, function(err, subResult) {
+        console.log(err);
         QuestionPlusSub.push(subResult);
         var results = QuestionPlusSub;
-        con.end();
+        
         callback(results);
+        con.end();
       });
     });
   });

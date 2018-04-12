@@ -134,7 +134,7 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
 
         this.currentGame++;
     }).catch((rejectValue) => {
-      //console.log(rejectValue);
+      console.log(rejectValue);
     });
     
     
@@ -408,12 +408,18 @@ Init.prototype.socketHandler = function(socket) {
           }
       }
       if (thisInstance.users[socket.id].ingame) {
-        if (thisInstance.games[thisInstance.users[socket.id].gameID].gameType == gamesTypes[1]) {
-          if (thisInstance.users[socket.id].gameData.token == "circle") {
-              thisInstance.games[thisInstance.users[socket.id].gameID].game.end("cross");
-          } else {
-              thisInstance.games[thisInstance.users[socket.id].gameID].game.end("circle");
+        console.log();
+        var cGame = thisInstance.games[thisInstance.users[socket.id].gameID];
+        if (typeof cGame !== "undefined") {
+          if (cGame.gameType == gamesTypes[1]) {
+            if (thisInstance.users[socket.id].gameData.token == "circle") {
+                thisInstance.games[thisInstance.users[socket.id].gameID].game.end("cross");
+            } else {
+                thisInstance.games[thisInstance.users[socket.id].gameID].game.end("circle");
+            }
           }
+        } else {
+          //console.log(socket.id, thisInstance.users[socket.id]);
         }
       }
       delete thisInstance.users[socket.id];
@@ -441,14 +447,14 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privat
     var thisInstance = this;
     var promise = new Promise((resolve, reject) => {
         sqlS.FindQuestion(function(results) {
-            //console.log(results);
+            console.log(results);
             resolve(results);
         });
-    })
+    });
     //get question
     promise.then((results) => {
 
-        console.log(results);
+        //console.log(results);
         preparedGame.questionResults = results;
 
         var questionLength = results[1].length;
@@ -466,7 +472,7 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privat
 
         });
 
-
+        //console.log("running callback for preStartMathGame");
         callback();
     }).catch((rejectValue) => {
       console.log(rejectValue);
