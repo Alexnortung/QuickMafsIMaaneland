@@ -176,6 +176,9 @@ Init.prototype.mathGameHandler = function(data, socket) {
         }
         var cPlayer = cGame.game.players[playerInt];
         var question = cGame.questionResults[1][cPlayer.progress];
+        if (typeof question === "undefined") {
+          return;
+        }
         //console.log(cPlayer.id, cGame);
         var correct = question.answer == data.value;
         cGame.game.addProgress(playerInt , correct);
