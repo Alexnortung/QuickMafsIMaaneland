@@ -464,7 +464,7 @@ function GameScene() {
 			textAlign(LEFT, TOP);
 			textSize(32);
 			var extra = getSize(4/1920,0);
-			text(i, qr.x + extra, qr.y+ extra);
+			text(i, getSize(qr.x + extra, 0), getSize(qr.y+ extra, 1));
 
 			pop();
 
