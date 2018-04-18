@@ -347,7 +347,7 @@ function GameScene() {
 		var thisInsatnce = this;
 		for (var i = 0; i < this.game.questionLength; i++) {
 			var r = new Region(
-				0.2  + i * 128/1920 , 0.05,
+				0.2  + (i * 128/1920) , 0.05,
 				40/1920, 40/1920, {i: i}
 			);
 
@@ -464,7 +464,7 @@ function GameScene() {
 			textAlign(LEFT, TOP);
 			textSize(32);
 			var extra = getSize(4/1920,0);
-			text(i, getSize(qr.x + extra, 0), getSize(qr.y+ extra, 1));
+			text(i, getSize(qr.x,0) + extra, getSize(qr.y,1)+ extra);
 
 			pop();
 
