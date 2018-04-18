@@ -5,7 +5,7 @@ var socket;
 var currentGame;
 var findingGame = false;
 var ingame = false;
-var canvasSize;
+var canvasSize = {w: 1920, h: 1080};
 var playersOnlineNumber = 1;
 
 $(function ()
@@ -345,10 +345,11 @@ function GameScene() {
 		//instantiate regions for showing questions
 		this.questionRegions = [];
 		var thisInsatnce = this;
+		var regionTextSize = 82;
 		for (var i = 0; i < this.game.questionLength; i++) {
 			var r = new Region(
-				0.2  + (i * 128/1920) , 0.05,
-				40/1920, 40/1920, {i: i}
+				0.2  + (i * 180/1920) , 0.05,
+				regionTextSize/1920, regionTextSize/1920, {i: i, textSize: regionTextSize}
 			);
 
 			r.onclick = function () {
