@@ -347,8 +347,8 @@ function GameScene() {
 		var thisInsatnce = this;
 		for (var i = 0; i < this.game.questionLength; i++) {
 			var r = new Region(
-				getSize(0.2 , 0) + i * getSize(128/1920, 0), getSize(0.05 , 1),
-				getSize(40/1920, 0), getSize(40/1920, 0), {i: i}
+				0.2  + i * 128/1920 , 0.05,
+				40/1920, 40/1920, {i: i}
 			);
 
 			r.onclick = function () {
