@@ -19,6 +19,8 @@ function GetPictureSize(imgname, callback)
 // Function tager imod billede dimensioner, og kan scalere det til max width eller height uden det bliver distortet
 function ResizeImage(width, height, maxwidth, maxheight)
 {
+  //width and height should be the width and height of the original image
+  
   if (width >= height)
   {
     // Finder hvor mange procent større width er

@@ -52,6 +52,22 @@ function draw() {
 	mgr.draw();
 }
 
+
+function windowResized() {
+	//console.log("resizing canvas");
+	//this is a p5 function
+	//resize the canvas
+	//ideal dimensions of the canvas
+	var dimensions = {width: 1920, height: 1080};
+
+	//calculate the new dimensions of the canvas
+	var newDimensions = ResizeImage(dimensions.width, dimensions.height, windowWidth, windowHeight);
+
+	//resize the canvas
+	resizeCanvas(newDimensions.width, newDimensions.height);
+}
+
+
 function mousePressed() {
 	//p5 function
 	mgr.scene.oScene.mousePress();
@@ -60,8 +76,10 @@ function mousePressed() {
 
 function getSize(percent, direction){
 	if (direction == 0) {
+		//width of the canvas from p5
 		return percent * width;
 	} else {
+		//height of the canvas from p5
 		return percent * height;
 	}
 }
@@ -73,7 +91,7 @@ function MainMenu() {
 		this.bg = loadImage("img/MånebyLockedandLoadedExpandedVersion.png");
 		this.queueBut = loadImage("img/Queue.png");
 		//create click regions
-		this.findMatchRegion = new Region(getSize(0.7, 0), getSize(0.75, 1), getSize(0.2, 0), getSize(0.175, 1));
+		this.findMatchRegion = new Region(0.7, 0.75 , 0.2 , 0.175 );
 		this.findMatchRegion.onclick = function () {
 			
 			findGame();
@@ -102,14 +120,14 @@ function MainMenu() {
 		var r = this.findMatchRegion;
 		if (!this.findingMatch) {
 			r.isInside() ? fill(28, 101, 219) : fill(0, 128, 43);
-			rect(r.x, r.y, r.w, r.h, 20);
+			rect(getSize(r.x, 0), getSize(r.y, 1), getSize(r.w, 0), getSize(r.h,1), 20);
 			pop();
 			push();
 			textSize(getSize(0.05, 1));
 			text("Find Match", getSize(0.735, 0), getSize(0.85, 1));
 		}else {
 			r.isInside() ? fill(219, 206, 28) : fill(219, 37, 28);
-			rect(r.x, r.y, r.w, r.h, 20);
+			rect(getSize(r.x, 0), getSize(r.y, 1), getSize(r.w, 0), getSize(r.h,1), 20);
 			pop();
 			push();
 			textSize(getSize(0.05, 1));
@@ -636,7 +654,7 @@ function Question(imgPath, qId, answers) {
 	
 	var thisInsatnce = this;
 	
-	GetResizedImage(750, 750, imgPath, (sizeObj) => {
+	GetResizedImage(1000, 1000, imgPath, (sizeObj) => {
 		thisInsatnce.imgSize = sizeObj;
 	});
 	this.img = loadImage(imgPath);
@@ -681,16 +699,16 @@ function Region(x,y,width, height, extras) {
 
 Region.prototype.isInside = function() {
 	//check the position of the mouse relative to the region.
-	if (this.x > mouseX) {
+	if (getSize(this.x, 0) > mouseX) {
 		return false;
 	}
-	if ((this.x + this.w) < mouseX ) {
+	if (getSize(this.x + this.w, 0) < mouseX ) {
 		return false;
 	}
-	if (this.y > mouseY) {
+	if (getSize(this.y, 1) > mouseY) {
 		return false;
 	}
-	if ((this.y + this.h) < mouseY ) {
+	if (getSize(this.y + this.h, 1) < mouseY ) {
 		return false;
 	}
 	//returns true if the mouse is inside
