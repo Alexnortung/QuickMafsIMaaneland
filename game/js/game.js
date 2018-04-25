@@ -103,7 +103,9 @@ function MainMenu() {
 			width: getSize(ciWidth, 0),
 			y: getSize(0.8, 1),
 			onsubmit: function(){
+				
 				changeNickname(this.value());
+				console.log(this.value());
 				this.value("");
 			}
 		});
@@ -239,7 +241,7 @@ function onCancelMatchResponse(data) {
 
 
 function changeNickname(nickname){
-	socket.emit("changeNicname", nickname);
+	socket.emit("changeNickname", nickname);
 }
 
 
