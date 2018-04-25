@@ -251,12 +251,10 @@ Init.prototype.socketHandler = function(socket) {
     socket.on("changeNickname", function(data) {
       thisInstance.users[socket.id].nickname = data;
       var preparedNicknameChange = {};
-<<<<<<< HEAD
-      /*if (thisInstance.users[socket.id].ingame == true) {
-=======
+
       console.log("User: " + socket.id + " Changed nickname to " + thisInstance.users[socket.id].nickname);
-      if (thisInstance.users[socket.id].ingame == true) {
->>>>>>> 6668341973ab9d54f2c30b5679d7cf34fb37dd40
+      /*if (thisInstance.users[socket.id].ingame == true) {
+
           preparedNicknameChange.nickname = data;
           preparedNicknameChange.gameId = thisInstance.users[socket.id].gameID;
           preparedNicknameChange.gameData = thisInstance.users[socket.id].gameData;
@@ -264,7 +262,7 @@ Init.prototype.socketHandler = function(socket) {
       } else {*/
           preparedNicknameChange.nickname = data;
           socket.emit("changeNickname", preparedNicknameChange);
-      /*}*/
+      //}
     });
 
     socket.on("findGame", function (data) {
