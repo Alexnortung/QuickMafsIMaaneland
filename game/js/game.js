@@ -7,6 +7,7 @@ var findingGame = false;
 var ingame = false;
 var canvasSize = {w: 1920, h: 1080};
 var playersOnlineNumber = 1;
+var myNickname = "";
 
 $(function ()
 {
@@ -20,7 +21,8 @@ $(function ()
 	socket.on("progress", onAddprogress);
 	socket.on("question", onQuestionRecieved);
 	socket.on("answer", onAnswerRecieved);
-	socket.on("playerOnline", onPlayersOnline)
+	socket.on("playerOnline", onPlayersOnline);
+	socket.on("changeNickname", onNicknameChange);
 
 
 });
@@ -65,6 +67,12 @@ function windowResized() {
 
 	//resize the canvas
 	resizeCanvas(newDimensions.width, newDimensions.height);
+
+	var tScene = mgr.scene.oScene;
+	if (typeof tScene.windowResized == "function") {
+		tScene.windowResized();
+	}
+
 }
 
 
@@ -86,7 +94,27 @@ function getSize(percent, direction){
 
 
 function MainMenu() {
+
+	this.createNameInput = function() {
+		var ciWidth = 250/1920;
+		this.nameInput = new CanvasInput({
+			canvas: document.getElementById(c.canvas.id),
+			x: getSize(0.5 - 0.5*ciWidth, 0),
+			width: getSize(ciWidth, 0),
+			y: getSize(0.8, 1),
+			onsubmit: function(){
+				changeNickname(this.value());
+				this.value("");
+			}
+		});
+	}
+
 	this.setup = function(){
+
+		this.createNameInput();		
+
+		
+
 		this.findingMatch = false;
 		this.bg = loadImage("img/MånebyLockedandLoadedExpandedVersion.png");
 		this.queueBut = loadImage("img/Queue.png");
@@ -146,7 +174,16 @@ function MainMenu() {
 		pop();
 
 
+		
+
+		this.nameInput.render();
+
+
 	}
+}
+
+MainMenu.prototype.windowResized = function() {
+	this.createNameInput();
 }
 
 MainMenu.prototype.mousePress = function () {
@@ -198,6 +235,16 @@ function onCancelMatchResponse(data) {
 
 	}
 
+}
+
+
+function changeNickname(nickname){
+	socket.emit("changeNicname", nickname);
+}
+
+
+function onNicknameChange(data){
+	myNickname = data;
 }
 
 
@@ -302,6 +349,8 @@ function onConnectAndGame(){
 
 function GameScene() {
 	this.setup = function(){
+
+
 
 		//get background image
 		this.bg = loadImage("img/Battleground.png");

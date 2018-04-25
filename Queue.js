@@ -247,15 +247,15 @@ Init.prototype.socketHandler = function(socket) {
     socket.on("changeNickname", function(data) {
       thisInstance.users[socket.id].nickname = data;
       var preparedNicknameChange = {};
-      if (thisInstance.users[socket.id].ingame == true) {
+      /*if (thisInstance.users[socket.id].ingame == true) {
           preparedNicknameChange.nickname = data;
           preparedNicknameChange.gameId = thisInstance.users[socket.id].gameID;
           preparedNicknameChange.gameData = thisInstance.users[socket.id].gameData;
           thisInstance.io.to("game" + thisInstance.users[socket.id].gameID).emit("changeNickname", preparedNicknameChange);
-      } else {
+      } else {*/
           preparedNicknameChange.nickname = data;
           socket.emit("changeNickname", preparedNicknameChange);
-      }
+      /*}*/
     });
 
     socket.on("findGame", function (data) {
