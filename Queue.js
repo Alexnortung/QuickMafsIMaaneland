@@ -21,18 +21,21 @@ function checkData(data) {
     }
 
     if (typeof data != "object") {
-        
+
         return false;
     }
     return data;
 }
 
 Init.prototype.findGame = function(socket, gameType) {
-    
+
     var foundGame = false;
     var gameID;
     var queueNumber;
     var preparedRes = {};
+
+    if (this.users[socket.id].nickname !== "")
+    {
     if (this.users[socket.id].ingame) {
         preparedRes.status = "ingame";
         preparedRes.message = "You are already in a game";
@@ -50,7 +53,7 @@ Init.prototype.findGame = function(socket, gameType) {
         //console.log(socket.id + " will now be queued");
     }
 
-    
+
 
     if (typeof this.queue[0] !== "undefined") {
         for (i = 0; i < this.queue.length; i++) {
@@ -62,7 +65,7 @@ Init.prototype.findGame = function(socket, gameType) {
         }
     }
 
-    
+
 
     /* If game not found: put player in queue*/
 
@@ -80,7 +83,8 @@ Init.prototype.findGame = function(socket, gameType) {
         this.queue.splice(queueNumber, 1);
         this.startGame([socket, queueDetails.socket], gameType);
     }
-    
+  }
+
 };
 
 Init.prototype.startGame = function(players, gameType, privateGame, gameId)
@@ -97,7 +101,7 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
         this.users[players[i].id].gameID = gameId;
     }
 
-    
+
 
     var preparedGame = {};
     var thisInstance = this;
@@ -128,7 +132,7 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
                 qId: question.id
             });
         }
-        
+
 
 
 
@@ -136,8 +140,8 @@ Init.prototype.startGame = function(players, gameType, privateGame, gameId)
     }).catch((rejectValue) => {
       console.log(rejectValue);
     });
-    
-    
+
+
 };
 
 
@@ -205,7 +209,7 @@ Init.prototype.mathGameHandler = function(data, socket) {
                 qId: question.id
             });
         }
-        
+
 
         /*console.log("emitted", {
             correct: correct,
@@ -247,7 +251,12 @@ Init.prototype.socketHandler = function(socket) {
     socket.on("changeNickname", function(data) {
       thisInstance.users[socket.id].nickname = data;
       var preparedNicknameChange = {};
+<<<<<<< HEAD
       /*if (thisInstance.users[socket.id].ingame == true) {
+=======
+      console.log("User: " + socket.id + " Changed nickname to " + thisInstance.users[socket.id].nickname);
+      if (thisInstance.users[socket.id].ingame == true) {
+>>>>>>> 6668341973ab9d54f2c30b5679d7cf34fb37dd40
           preparedNicknameChange.nickname = data;
           preparedNicknameChange.gameId = thisInstance.users[socket.id].gameID;
           preparedNicknameChange.gameData = thisInstance.users[socket.id].gameData;
@@ -292,7 +301,7 @@ Init.prototype.socketHandler = function(socket) {
                 //all players have not loaded
                 //console.log(cGame.players[i].id);
                 return;
-            } 
+            }
         }
 
         console.log("both players have loaded");
@@ -310,10 +319,10 @@ Init.prototype.socketHandler = function(socket) {
             qId: question.id
         });
 
-        
-    
 
-        
+
+
+
     });
 
 
@@ -428,13 +437,13 @@ Init.prototype.socketHandler = function(socket) {
       delete thisInstance.users[socket.id];
       thisInstance.io.sockets.emit("playerOnline", thisInstance.getPlayersOnlineNumber());
     });
-    
+
 }
 
 
 function Init(io) {
     this.io = io;
-    
+
     this.queue = [];
     this.games = {};
     this.users = {};
@@ -462,8 +471,8 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privat
 
         var questionLength = results[1].length;
         var preRes = {
-            player0: players[0].id,
-            player1: players[1].id,
+            player0: thisInstance.users[players[0].id].nickname,
+            player1: thisInstance.users[players[1].id].nickname,
             questionLength: questionLength
         }
 
@@ -480,10 +489,10 @@ Init.prototype.preStartMathGame = function(players, preparedGame, gameId, privat
     }).catch((rejectValue) => {
       console.log(rejectValue);
     });
-    
-     
 
-    
+
+
+
 };
 
 Init.prototype.endGame = function(winner, gameId) {
