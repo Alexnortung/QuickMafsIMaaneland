@@ -47,6 +47,8 @@ function setup() {
 	//show the first scene
 	mgr.showNextScene();
 
+	windowResized();
+
 }
 
 function draw() {
