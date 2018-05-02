@@ -708,7 +708,7 @@ function Question(imgPath, qId, answers) {
 	
 	var thisInsatnce = this;
 	
-	GetResizedImage(1000, 1000, imgPath, (sizeObj) => {
+	GetResizedImage(750, 750, imgPath, (sizeObj) => {
 		thisInsatnce.imgSize = sizeObj;
 	});
 	this.img = loadImage(imgPath);
