@@ -399,7 +399,7 @@ function GameScene() {
 		var thisInsatnce = this;
 
 		//instantiate input
-		this.createAnswerBox
+		this.createAnswerBox();
 
 		//instantiate regions for showing questions
 		this.questionRegions = [];
