@@ -23,19 +23,19 @@ function ResizeImage(width, height, maxwidth, maxheight)
   
   if (width >= height)
   {
-    // Finder hvor mange procent større width er
+    // Finder hvor mange procent større width og height er
     var scaleW = maxwidth / width;
     var scaleH = maxheight / height;
-    if (scaleW > scaleH) {
-      width = width * scaleH;
-      height = height * scaleH;
-    }else {
-      width = width * scaleW;
-      height = height * scaleW;
-    }
+    var scale;
+
+
+    //sætter scale til at være den mindste scale
+    scaleW > scaleH ? scale = scaleH : scale = scaleW; 
+    
 
     // Ganger op på scale af dimensionerne
-    
+    width = width * scale;
+    height = height * scale;
 
     //Sender informationen videre
     return {width: width, height: height};
