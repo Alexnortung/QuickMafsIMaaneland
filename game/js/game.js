@@ -272,7 +272,7 @@ function onFindMatchResponse(data) {
 	}
 
 	if (d1.status) {
-		var tScene = mgr.scene.oScene
+		var tScene = mgr.findScene(MainMenu).oScene;
 		//in queue
 		tScene.findingMatch = true;
 		//change region from find match to cancel search
@@ -352,6 +352,22 @@ function onConnectAndGame(){
 
 
 function GameScene() {
+
+	this.createAnswerBox = function() {
+		var ciWidth = 250/1920;
+		this.ci = new CanvasInput({
+			canvas: document.getElementById(c.canvas.id),
+			x: getSize(0.5 - 0.5*ciWidth, 0),
+			width: getSize(ciWidth, 0),
+			y: getSize(0.8, 1),
+			onsubmit: function(){
+				answerQuestion(this.value(), thisInsatnce.questionHolder.getCurrentQuestion().id);
+				this.value("");
+			}
+		});
+	}
+
+
 	this.setup = function(){
 
 
@@ -383,17 +399,7 @@ function GameScene() {
 		var thisInsatnce = this;
 
 		//instantiate input
-		var ciWidth = 250/1920;
-		this.ci = new CanvasInput({
-			canvas: document.getElementById(c.canvas.id),
-			x: getSize(0.5 - 0.5*ciWidth, 0),
-			width: getSize(ciWidth, 0),
-			y: getSize(0.8, 1),
-			onsubmit: function(){
-				answerQuestion(this.value(), thisInsatnce.questionHolder.getCurrentQuestion().id);
-				this.value("");
-			}
-		});
+		this.createAnswerBox
 
 		//instantiate regions for showing questions
 		this.questionRegions = [];
