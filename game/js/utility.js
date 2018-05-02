@@ -24,11 +24,18 @@ function ResizeImage(width, height, maxwidth, maxheight)
   if (width >= height)
   {
     // Finder hvor mange procent større width er
-    var scale = maxwidth / width;
+    var scaleW = maxwidth / width;
+    var scaleH = maxheight / height;
+    if (scaleW > scaleH) {
+      width = width * scaleH;
+      height = height * scaleH;
+    }else {
+      width = width * scaleW;
+      height = height * scaleW;
+    }
 
     // Ganger op på scale af dimensionerne
-    width = width * scale;
-    height = height * scale;
+    
 
     //Sender informationen videre
     return {width: width, height: height};
