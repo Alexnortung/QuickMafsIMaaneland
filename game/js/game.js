@@ -8,6 +8,8 @@ var ingame = false;
 var canvasSize = {w: 1920, h: 1080};
 var playersOnlineNumber = 1;
 var myNickname = "";
+const xDir = 0;
+const yDir = 1;
 
 $(function ()
 {
@@ -107,7 +109,7 @@ function MainMenu() {
 			onsubmit: function(){
 				
 				changeNickname(this.value());
-				console.log(this.value());
+				//console.log(this.value());
 				this.value("");
 			}
 		});
@@ -399,7 +401,17 @@ function GameScene() {
 		var thisInsatnce = this;
 
 		//instantiate input
-		this.createAnswerBox();
+		var ciWidth = 250/1920;
+		this.ci = new CanvasInput({
+			canvas: document.getElementById(c.canvas.id),
+			x: getSize(0.5 - 0.5*ciWidth, 0),
+			width: getSize(ciWidth, 0),
+			y: getSize(0.8, 1),
+			onsubmit: function(){
+				answerQuestion(this.value(), thisInsatnce.questionHolder.getCurrentQuestion().id);
+				this.value("");
+			}
+		});
 
 		//instantiate regions for showing questions
 		this.questionRegions = [];
@@ -437,11 +449,11 @@ function GameScene() {
 		//draw player names
 		push();
 		fill(255,255,0);
-		textSize(getSize(32/1920,0));
+		textSize(getSize(32/1920,xDir));
 		textAlign(LEFT,TOP);
-		text(this.game.player0.name, getSize(0.01,0), getSize(0.01,1));
+		text(this.game.player0.name, getSize(0.01,xDir), getSize(0.01,yDir));
 		textAlign(RIGHT,TOP);
-		text(this.game.player1.name, getSize(0.99,0), getSize(0.01,1));
+		text(this.game.player1.name, getSize(0.99,xDir), getSize(0.01,yDir));
 		pop();
 
 
@@ -561,6 +573,21 @@ function GameScene() {
 
 GameScene.prototype.mousePress = function () {
 	this._mouseHandler.onClick(mouseX, mouseY);
+}
+
+
+GameScene.prototype.windowResized =function() {
+	var ciWidth = 250/1920;
+	this.ci = new CanvasInput({
+		canvas: document.getElementById(c.canvas.id),
+		x: getSize(0.5 - 0.5*ciWidth, xDir),
+		width: getSize(ciWidth, xDir),
+		y: getSize(0.8, 1),
+		onsubmit: function(){
+			answerQuestion(this.value(), thisInsatnce.questionHolder.getCurrentQuestion().id);
+			this.value("");
+		}
+	});
 }
 
 

@@ -281,6 +281,12 @@ Init.prototype.socketHandler = function(socket) {
     });
 
     socket.on("startedGame", function(data) {
+
+        if (!thisInstance.socketExists(socket.id)) {
+          return;
+        }
+
+
         //console.log("player loaded game");
 
         //if all players in the game has loaded: send the question
@@ -437,6 +443,15 @@ Init.prototype.socketHandler = function(socket) {
     });
 
 }
+
+
+Init.prototype.socketExists = function(socektId) {
+  if (typeof this.users[socketId] !== "undefined") {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 
 function Init(io) {
