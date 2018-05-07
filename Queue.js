@@ -445,7 +445,7 @@ Init.prototype.socketHandler = function(socket) {
 }
 
 
-Init.prototype.socketExists = function(socektId) {
+Init.prototype.socketExists = function(socketId) {
   if (typeof this.users[socketId] !== "undefined") {
     return true;
   } else {
